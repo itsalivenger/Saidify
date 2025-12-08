@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Heart, ShoppingBag, Eye, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface ProductCardProps {
     product: {
@@ -13,28 +14,32 @@ interface ProductCardProps {
         category: string;
         rating: number;
     };
-    onQuickView: (product: any) => void;
+    onQuickView?: (product: any) => void;
 }
 
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
     return (
         <div className="group">
             <div className="relative overflow-hidden rounded-xl bg-neutral-100 aspect-[3/4] mb-4">
-                <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+                <Link href={`/shop/${product.id}`}>
+                    <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                </Link>
 
                 {/* Overlay Actions */}
                 <div className="absolute inset-x-0 bottom-4 px-4 flex justify-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                    <button
-                        onClick={() => onQuickView(product)}
-                        className="p-3 bg-white text-black rounded-full shadow-lg hover:bg-neutral-100 transition-colors"
-                        title="Quick View"
-                    >
-                        <Eye className="w-5 h-5" />
-                    </button>
+                    {onQuickView && (
+                        <button
+                            onClick={() => onQuickView(product)}
+                            className="p-3 bg-white text-black rounded-full shadow-lg hover:bg-neutral-100 transition-colors"
+                            title="Quick View"
+                        >
+                            <Eye className="w-5 h-5" />
+                        </button>
+                    )}
                     <button
                         className="p-3 bg-black text-white rounded-full shadow-lg hover:bg-neutral-800 transition-colors flex items-center gap-2 px-6"
                     >
@@ -59,9 +64,11 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                         <span className="text-xs text-neutral-500 ml-1 font-medium">{product.rating}</span>
                     </div>
                 </div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer truncate">
-                    {product.title}
-                </h3>
+                <Link href={`/shop/${product.id}`}>
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer truncate">
+                        {product.title}
+                    </h3>
+                </Link>
                 <p className="font-bold">{product.price}</p>
             </div>
         </div>
