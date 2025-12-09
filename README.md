@@ -1,41 +1,110 @@
-# E-commerce Site Project
+# LuxeMart - Premium E-commerce Application
 
 ## Project Context
-This is a modern, responsive e-commerce landing page built with **Next.js 15**, **React 19**, **Tailwind CSS v4**, and **Framer Motion**. The design goal is a premium, high-converting aesthetic using smooth animations and a consistent blue-based color palette.
+LuxeMart is a modern, responsive e-commerce web application built with **Next.js 15**, **React 19**, **MongoDB**, and **Framer Motion**. It features a premium design aesthetic, server-side authentication, a scalable hybrid cart system, and a newsletter subscription service.
+
+## Tech Stack
+- **Framework**: Next.js 15 (App Router)
+- **Frontend library**: React 19
+- **Database**: MongoDB Atlas (with Mongoose)
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Authentication**: Custom JWT-based Auth (HTTP-only cookies)
+- **Icons**: Lucide React
+
+## Core Features
+1.  **Authentication**
+    - Signup (`/api/auth/signup`) using bcryptjs for password hashing.
+    - Login (`/api/auth/login`) generating secure JWTs.
+    - Protected routes & user role management (User/Admin).
+
+2.  **Shopping Cart System (Hybrid)**
+    - **Guest Mode**: Cart stored in `localStorage` for non-logged-in users.
+    - **Auth Mode**: Cart synced to MongoDB `User.cart` array when logged in.
+    - **Seamless Experience**: Automatic state switching via `CartContext`.
+
+3.  **Wishlist**
+    - Dedicated page (`/wishlist`) to save items for later.
+    - Currently local-only (future backend integration planned).
+
+4.  **Newsletter**
+    - Decoupled `Subscriber` collection for scalability.
+    - Idempotent API (`/api/newsletter`) preventing duplicate records while giving positive user feedback.
+    - Integrated directly into a reusable `Newsletter` component.
 
 ## Architecture
-We follow a component-driven architecture where each component resides in its own folder within `src/components/`.
 
 ### Folder Structure
 ```
 src/
-├── app/                  # Next.js App Router pages
-├── components/           # UI Components
-│   ├── Hero/             # Hero Component Folder
-│   │   └── Hero.tsx      
-│   ├── Navbar/           # Navbar Component Folder
-│   │   └── Navbar.tsx
-│   └── ...               # Future components
-├── lib/                  # Utilities (e.g., cn helper)
+├── app/                  
+│   ├── api/              # Backend API Routes (Auth, Cart, Newsletter)
+│   ├── cart/             # Cart Page
+│   ├── shop/             # Product Listing & Details
+│   └── ...
+├── components/           # Reusable UI Components
+│   ├── Navbar/           
+│   ├── Footer/           
+│   ├── Newsletter/       
+│   └── ...               
+├── context/              # Global State (CartContext)
+├── lib/                  # Utilities (DB connection, formats)
+├── models/               # Mongoose Schemas (User, Subscriber)
 └── ...
 ```
 
-## Design System
+## Data Models
 
-### Color Palette
-We use CSS variables for global color management. All colors are defined in `src/app/globals.css`.
+### User (src/models/User.ts)
+- `name`: String (Required)
+- `email`: String (Unique, Required)
+- `password`: String (Hashed)
+- `role`: "user" | "admin"
+- `cart`: Array of product items (Embedded for performance)
 
-| Variable | Light Mode | Dark Mode | Description |
+### Subscriber (src/models/Subscriber.ts)
+- `email`: String (Unique, Indexed)
+- `status`: "active" | "unsubscribed" | "pending"
+- `source`: String (e.g., "footer")
+
+## Setup Instructions
+
+### 1. Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas Account
+
+### 2. Environment Variables
+Create a `.env.local` file in the root directory:
+```bash
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
+JWT_SECRET=your_super_secure_random_string
+```
+
+### 3. Installation
+```bash
+npm install
+# Ensure backend deps are installed:
+npm install mongoose bcryptjs jsonwebtoken @types/bcryptjs @types/jsonwebtoken
+```
+
+### 4. Running Locally
+```bash
+npm run dev
+```
+Visit `http://localhost:3000`.
+
+## API Documentation
+
+| Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `--background` | `#ffffff` | `#0a0a0a` | Page background |
-| `--foreground` | `#171717` | `#ededed` | Primary text color |
-| `--primary` | `#2563eb` (Blue 600) | `#3b82f6` (Blue 500) | Primary brand color (Buttons, Highlights) |
-| `--secondary` | `#1e40af` (Blue 800) | `#1e3a8a` (Blue 900) | Secondary brand color |
-| `--accent` | `#eff6ff` (Blue 50) | `#172554` (Blue 950) | Subtle backgrounds/accents |
-| `--muted` | `#f5f5f5` | `#262626` | Muted backgrounds |
-| `--muted-foreground` | `#737373` | `#a3a3a3` | Secondary text color |
+| `POST` | `/api/auth/signup` | Register new user | No |
+| `POST` | `/api/auth/login` | Login & set cookie | No |
+| `GET` | `/api/cart` | Get user's cart | Yes |
+| `POST` | `/api/cart` | Add item to cart | Yes |
+| `PUT` | `/api/cart` | Sync full cart | Yes |
+| `POST` | `/api/newsletter` | Subscribe email | No |
 
-### Aesthetics
-- **Type**: Clean sans-serif (App default: Arial/Helvetica/Geist).
-- **Radius**: Soft rounded corners (`rounded-lg`, `rounded-xl`).
-- **Animations**: Framer Motion for entrance and interactions.
+## Design System
+- **Colors**: Defined in `globals.css` (primary blue palette).
+- **Typography**: Clean sans-serif.
+- **Components**: Modular and self-contained in `src/components`.

@@ -1,6 +1,7 @@
 "use client";
 
-import { Facebook, Instagram, Twitter, Youtube, CreditCard } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube, CreditCard, Mail, MapPin, Phone } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
     return (
@@ -33,23 +34,11 @@ export default function Footer() {
                     <div>
                         <h4 className="text-white font-bold mb-6">Shop</h4>
                         <ul className="space-y-4">
-                            <li><a href="#" className="hover:text-white transition-colors">New Arrivals</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Best Sellers</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Men</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Women</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Accessories</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Support Column */}
-                    <div>
-                        <h4 className="text-white font-bold mb-6">Support</h4>
-                        <ul className="space-y-4">
-                            <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Order Status</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Returns & Exchanges</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">New Arrivals</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Best Sellers</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Men</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Women</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Accessories</Link></li>
                         </ul>
                     </div>
 
@@ -57,11 +46,23 @@ export default function Footer() {
                     <div>
                         <h4 className="text-white font-bold mb-6">Company</h4>
                         <ul className="space-y-4">
-                            <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Sustainability</a></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Sustainability</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Support Column - Moved to 4th column to balance layout since Newsletter is gone */}
+                    <div>
+                        <h4 className="text-white font-bold mb-6">Support</h4>
+                        <ul className="space-y-4">
+                            <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Order Status</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Shipping Info</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>
                 </div>

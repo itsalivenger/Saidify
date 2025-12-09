@@ -2,8 +2,39 @@
 
 import { motion } from "framer-motion";
 import { Mail, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export default function Newsletter() {
+    const [email, setEmail] = useState("");
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+    const [message, setMessage] = useState("");
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus("loading");
+
+        try {
+            const res = await fetch("/api/newsletter", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setStatus("success");
+                setMessage(data.message);
+                setEmail("");
+            } else {
+                setStatus("error");
+                setMessage(data.message || "Something went wrong.");
+            }
+        } catch (error) {
+            setStatus("error");
+            setMessage("Failed to subscribe. Please try again.");
+        }
+    };
     return (
         <section className="py-24 bg-background">
             <div className="w-full px-4 md:px-8 max-w-4xl mx-auto">
@@ -43,23 +74,40 @@ export default function Newsletter() {
                             Subscribe to our newsletter and get 10% off your first order plus exclusive access to new drops.
                         </motion.p>
 
-                        <motion.form
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
-                            onSubmit={(e) => e.preventDefault()}
                         >
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/10 text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 dark:bg-black/5 dark:border-black/5 dark:text-black dark:placeholder:text-neutral-500 dark:focus:ring-black/20 transition-all"
-                            />
-                            <button className="px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2 dark:bg-black dark:text-white dark:hover:bg-neutral-800">
-                                Subscribe <ArrowRight className="w-4 h-4" />
-                            </button>
-                        </motion.form>
+                            <form
+                                className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto relative"
+                                onSubmit={handleSubscribe}
+                            >
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={status === "loading" || status === "success"}
+                                    className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/10 text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 dark:bg-black/5 dark:border-black/5 dark:text-black dark:placeholder:text-neutral-500 dark:focus:ring-black/20 transition-all disabled:opacity-50"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={status === "loading" || status === "success"}
+                                    className="px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-neutral-200 transition-colors flex items-center justify-center gap-2 dark:bg-black dark:text-white dark:hover:bg-neutral-800 disabled:opacity-50"
+                                >
+                                    {status === "loading" ? "..." : "Subscribe"}
+                                    {status !== "loading" && <ArrowRight className="w-4 h-4" />}
+                                </button>
+                            </form>
+                            {message && (
+                                <p className={`mt-4 text-sm ${status === "success" ? "text-green-500" : "text-red-500"}`}>
+                                    {message}
+                                </p>
+                            )}
+                        </motion.div>
 
                         <p className="mt-6 text-xs text-neutral-500">
                             By subscribing you agree to our Terms & Conditions.

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,20 @@ import { useCart } from "@/context/CartContext";
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
     const { totalItems } = useCart();
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+            setIsSearchOpen(false);
+            setSearchQuery("");
+        }
+    };
 
     // Handle scroll effect
     useEffect(() => {
@@ -77,9 +91,40 @@ export default function Navbar() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-4">
-                            <button className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent">
-                                <Search className="w-5 h-5" />
-                            </button>
+                            <div className="relative flex items-center">
+                                <AnimatePresence>
+                                    {isSearchOpen ? (
+                                        <motion.form
+                                            initial={{ width: 0, opacity: 0 }}
+                                            animate={{ width: 200, opacity: 1 }}
+                                            exit={{ width: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            onSubmit={handleSearch}
+                                            className="overflow-hidden"
+                                        >
+                                            <input
+                                                ref={searchInputRef}
+                                                type="text"
+                                                placeholder="Search..."
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                onBlur={() => !searchQuery && setIsSearchOpen(false)}
+                                                className="w-full bg-accent/50 border-none rounded-full py-1.5 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                                                autoFocus
+                                            />
+                                        </motion.form>
+                                    ) : null}
+                                </AnimatePresence>
+                                <button
+                                    onClick={() => {
+                                        setIsSearchOpen(true);
+                                        setTimeout(() => searchInputRef.current?.focus(), 100);
+                                    }}
+                                    className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent"
+                                >
+                                    <Search className="w-5 h-5" />
+                                </button>
+                            </div>
                             <Link href="/login" className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent hidden sm:block">
                                 <User className="w-5 h-5" />
                             </Link>
