@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
+import Link from "next/link";
 
 export default function CartSummary() {
     const { subtotal } = useCart();
@@ -36,9 +37,12 @@ export default function CartSummary() {
                 </div>
             </div>
 
-            <button className="w-full bg-black text-white dark:bg-white dark:text-black py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center">
+            <Link
+                href="/checkout"
+                className="w-full bg-black text-white dark:bg-white dark:text-black py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center cursor-pointer"
+            >
                 Proceed to Checkout
-            </button>
+            </Link>
         </div>
     );
 }

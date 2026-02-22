@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface CartItem {
-    id: number;
+    id: string | number;
     title: string;
     price: string;
     image: string;
@@ -15,8 +15,8 @@ export interface CartItem {
 interface CartContextType {
     items: CartItem[];
     addToCart: (item: CartItem) => void;
-    removeFromCart: (id: number) => void;
-    updateQuantity: (id: number, quantity: number) => void;
+    removeFromCart: (id: string | number) => void;
+    updateQuantity: (id: string | number, quantity: number) => void;
     clearCart: () => void;
     totalItems: number;
     subtotal: number;
@@ -95,7 +95,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const prevItems = [...items];
         setItems((currentItems) => {
             const existingItemIndex = currentItems.findIndex(
-                (item) => item.id === newItem.id && item.selectedSize === newItem.selectedSize && item.selectedColor === newItem.selectedColor
+                (item) => String(item.id) === String(newItem.id) &&
+                    item.selectedSize === newItem.selectedSize &&
+                    item.selectedColor === newItem.selectedColor
             );
 
             if (existingItemIndex > -1) {
@@ -132,7 +134,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const removeFromCart = async (id: number) => {
+    const removeFromCart = async (id: string | number) => {
         const prevItems = [...items];
         setItems((prev) => prev.filter((item) => item.id !== id));
 
@@ -148,7 +150,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const updateQuantity = async (id: number, quantity: number) => {
+    const updateQuantity = async (id: string | number, quantity: number) => {
         if (quantity < 1) return;
         const prevItems = [...items];
 

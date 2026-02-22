@@ -2,67 +2,39 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Star, ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ProductCard from '../Shop/ProductCard';
 
-const PRODUCTS = [
-    {
-        id: 1,
-        name: "Versatile Oxford Shirt",
-        price: "$59.00",
-        rating: 4.8,
-        reviews: 124,
-        tag: "Trending",
-        imageColor: "bg-blue-100",
-    },
-    {
-        id: 2,
-        name: "Classic Chino Shorts",
-        price: "$45.00",
-        rating: 4.6,
-        reviews: 89,
-        tag: "Best Seller",
-        imageColor: "bg-stone-100",
-    },
-    {
-        id: 3,
-        name: "Heavyweight Cotton Tee",
-        price: "$32.00",
-        rating: 4.9,
-        reviews: 210,
-        tag: "Hot",
-        imageColor: "bg-gray-200",
-    },
-    {
-        id: 4,
-        name: "Performance Joggers",
-        price: "$78.00",
-        rating: 4.7,
-        reviews: 156,
-        tag: "New",
-        imageColor: "bg-neutral-200",
-    },
-    {
-        id: 5,
-        name: "Waterproof Rain Jacket",
-        price: "$120.00",
-        rating: 4.9,
-        reviews: 75,
-        tag: "Sale",
-        imageColor: "bg-indigo-100",
-    },
-    {
-        id: 6,
-        name: "Leather Weekend Bag",
-        price: "$195.00",
-        rating: 4.8,
-        reviews: 42,
-        tag: "Premium",
-        imageColor: "bg-amber-100",
-    },
-];
+interface Product {
+    _id: string;
+    title: string;
+    price: number;
+    image: string;
+    category: string;
+}
 
 export default function BestSellers() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBestSellers = async () => {
+            try {
+                const res = await fetch('/api/products?isBestSeller=true&limit=8');
+                if (res.ok) {
+                    const data = await res.json();
+                    setProducts(data.products);
+                }
+            } catch (error) {
+                console.error("Failed to fetch best sellers", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBestSellers();
+    }, []);
+
     const carouselRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
@@ -118,58 +90,46 @@ export default function BestSellers() {
                 </div>
 
                 {/* Carousel Container */}
-                <div
-                    ref={carouselRef}
-                    onScroll={checkScroll}
-                    className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
-                    style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
-                >
-                    {PRODUCTS.map((product, index) => (
-                        <motion.div
-                            key={product.id}
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            className="min-w-[280px] md:min-w-[320px] snap-start"
-                        >
-                            <div className="group relative">
-                                {/* Image Area */}
-                                <div className={cn(
-                                    "aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100 relative mb-4",
-                                    product.imageColor
-                                )}>
-                                    {/* Tag */}
-                                    <div className="absolute top-3 left-3">
-                                        <span className="bg-white/90 backdrop-blur text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                                            {product.tag}
-                                        </span>
-                                    </div>
-
-                                    {/* Hover Overlay */}
-                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                    {/* Add to Cart Button */}
-                                    <button className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-white text-black font-medium py-3 rounded-xl shadow-lg translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 hover:bg-primary hover:text-white">
-                                        <ShoppingBag className="w-4 h-4" /> Add to Cart
-                                    </button>
-                                </div>
-
-                                {/* Info */}
-                                <div>
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className="font-semibold text-lg text-foreground truncate pr-2">{product.name}</h3>
-                                        <div className="flex items-center gap-1 text-amber-500 text-sm font-medium">
-                                            <Star className="w-3.5 h-3.5 fill-current" />
-                                            {product.rating}
-                                        </div>
-                                    </div>
-                                    <p className="text-muted-foreground text-sm font-medium">{product.price}</p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="min-w-[280px] md:min-w-[320px] aspect-[4/5] bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="py-20 text-center">
+                        <p className="text-muted-foreground">No best sellers available yet.</p>
+                    </div>
+                ) : (
+                    <div
+                        ref={carouselRef}
+                        onScroll={checkScroll}
+                        className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
+                        style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+                    >
+                        {products.map((product, index) => (
+                            <motion.div
+                                key={product._id}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                                className="min-w-[280px] md:min-w-[320px] snap-start"
+                            >
+                                <ProductCard
+                                    product={{
+                                        id: product._id,
+                                        title: product.title,
+                                        price: new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(product.price),
+                                        image: product.image,
+                                        category: product.category,
+                                        rating: 5
+                                    }}
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

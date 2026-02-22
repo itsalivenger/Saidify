@@ -21,7 +21,7 @@ export default function WishlistGrid({ products }: WishlistGridProps) {
                 </p>
                 <Link
                     href="/shop"
-                    className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-bold hover:brightness-110 transition-all"
+                    className="px-8 py-3 bg-white text-black rounded-full font-bold hover:bg-neutral-200 transition-all shadow-lg"
                 >
                     Start Shopping
                 </Link>

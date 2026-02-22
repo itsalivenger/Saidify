@@ -1,43 +1,40 @@
 "use client";
 
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, ArrowRight } from "lucide-react";
-import Image from "next/image"; // Used if we had real images, for now div placeholders
-import { cn } from "@/lib/utils";
+import { ArrowRight, ShoppingBag, Loader2 } from "lucide-react";
+import ProductCard from "../Shop/ProductCard";
 
-// Dummy Data
-const PRODUCTS = [
-    {
-        id: 1,
-        name: "Classic Minimalism Tee",
-        price: "$35.00",
-        category: "T-Shirts",
-        imageColor: "bg-neutral-200 dark:bg-neutral-800",
-    },
-    {
-        id: 2,
-        name: "Urban Cargo Pants",
-        price: "$89.00",
-        category: "Bottoms",
-        imageColor: "bg-neutral-300 dark:bg-neutral-700",
-    },
-    {
-        id: 3,
-        name: "Premium Knit Sweater",
-        price: "$120.00",
-        category: "Knitwear",
-        imageColor: "bg-neutral-200 dark:bg-neutral-800",
-    },
-    {
-        id: 4,
-        name: "Legacy Leather Jacket",
-        price: "$250.00",
-        category: "Outerwear",
-        imageColor: "bg-neutral-300 dark:bg-neutral-700",
-    },
-];
+interface Product {
+    _id: string;
+    title: string;
+    price: number;
+    image: string;
+    category: string;
+}
 
 export default function FeaturedProducts() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFeatured = async () => {
+            try {
+                const res = await fetch('/api/products?featured=true&limit=4');
+                if (res.ok) {
+                    const data = await res.json();
+                    setProducts(data.products);
+                }
+            } catch (error) {
+                console.error("Failed to fetch featured products", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchFeatured();
+    }, []);
+
     return (
         <section className="py-20 bg-background">
             <div className="container mx-auto px-4 md:px-6">
@@ -66,48 +63,34 @@ export default function FeaturedProducts() {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {PRODUCTS.map((product, index) => (
-                        <motion.div
-                            key={product.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            className="group relative"
-                        >
-                            {/* Image Container */}
-                            <div className={cn(
-                                "aspect-[3/4] w-full overflow-hidden rounded-xl relative",
-                                product.imageColor
-                            )}>
-                                {/* Overlay / Hover Actions */}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-
-                                {/* Quick Add Button */}
-                                <button className="absolute bottom-4 right-4 p-3 rounded-full bg-white text-black shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary hover:text-white">
-                                    <ShoppingBag className="w-5 h-5" />
-                                </button>
-
-                                {/* Badge (Optional) */}
-                                {index === 0 && (
-                                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded text-black shadow-sm">
-                                        BEST SELLER
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Info */}
-                            <div className="mt-4 space-y-1">
-                                <p className="text-xs text-muted-foreground">{product.category}</p>
-                                <h3 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors cursor-pointer">
-                                    {product.name}
-                                </h3>
-                                <p className="font-semibold text-foreground">{product.price}</p>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="aspect-[3/4] bg-neutral-100 dark:bg-neutral-900 rounded-xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center py-20 bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl">
+                        <ShoppingBag className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
+                        <p className="text-muted-foreground font-medium">No featured products yet.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {products.map((product, index) => (
+                            <ProductCard
+                                key={product._id}
+                                product={{
+                                    id: product._id,
+                                    title: product.title,
+                                    price: `${product.price.toFixed(2)} MAD`,
+                                    category: product.category,
+                                    image: product.image,
+                                    rating: 5 // Mock for now
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

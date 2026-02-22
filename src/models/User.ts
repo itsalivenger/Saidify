@@ -17,6 +17,11 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: [true, "Please provide a password"],
         },
+        phone: {
+            type: String,
+            required: [true, "Please provide a phone number"],
+            maxlength: [20, "Phone number cannot be more than 20 characters"],
+        },
         role: {
             type: String,
             enum: ["user", "admin"],
@@ -24,13 +29,19 @@ const UserSchema = new mongoose.Schema(
         },
         cart: [
             {
-                productId: { type: Number, required: true },
+                productId: { type: String, required: true },
                 title: { type: String, required: true },
                 price: { type: String, required: true },
                 image: { type: String },
                 quantity: { type: Number, default: 1 },
                 selectedSize: { type: String },
                 selectedColor: { type: String },
+            },
+        ],
+        wishlist: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
             },
         ],
     },

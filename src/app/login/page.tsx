@@ -1,23 +1,78 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import AuthInput from "@/components/Auth/AuthInput";
+import { cn } from "@/lib/utils";
+
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
+    const { login, isAuthenticated, loading: authLoading } = useAuth();
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const [formData, setFormData] = useState({ email: "", password: "" });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(searchParams.get("message") || "");
+
+    useEffect(() => {
+        if (!authLoading && isAuthenticated) {
+            router.push("/profile");
+        }
+    }, [authLoading, isAuthenticated, router]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                login(data.user);
+                router.push("/profile");
+            } else {
+                const data = await res.json();
+                setError(data.message || "Login failed");
+            }
+        } catch (err) {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (authLoading || isAuthenticated) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
+
     return (
         <AuthLayout
             title="Welcome back"
             subtitle="Enter your credentials to access your account"
             image="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2671&auto=format&fit=crop"
         >
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-4" onSubmit={handleSubmit}>
                 <AuthInput
                     label="Email"
                     type="email"
                     placeholder="name@example.com"
                     required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -35,11 +90,27 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         required
                         className="mt-0"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
                 </div>
 
-                <button className="w-full bg-primary text-primary-foreground h-12 rounded-lg font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20">
-                    Sign In
+                {error && (
+                    <p className={cn(
+                        "text-xs font-bold text-center py-2.5 rounded-xl border",
+                        error.includes('Account created')
+                            ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+                            : "text-rose-500 bg-rose-500/10 border-rose-500/20"
+                    )}>
+                        {error}
+                    </p>
+                )}
+
+                <button
+                    disabled={loading}
+                    className="w-full bg-white text-black h-12 rounded-xl font-bold hover:bg-neutral-200 transition-all shadow-lg cursor-pointer disabled:opacity-70"
+                >
+                    {loading ? "Signing In..." : "Sign In"}
                 </button>
 
                 <div className="relative my-8">
@@ -51,12 +122,11 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <button className="flex items-center justify-center gap-2 h-12 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors bg-background">
-                        <Github className="w-5 h-5" />
-                        <span className="font-medium text-sm">Github</span>
-                    </button>
-                    <button className="flex items-center justify-center gap-2 h-12 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors bg-background">
+                <div className="flex flex-col gap-4">
+                    <button
+                        type="button"
+                        className="flex items-center justify-center gap-3 h-12 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all bg-background cursor-pointer"
+                    >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path
                                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -75,7 +145,7 @@ export default function LoginPage() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        <span className="font-medium text-sm">Google</span>
+                        <span className="font-bold text-sm">Continue with Google</span>
                     </button>
                 </div>
 

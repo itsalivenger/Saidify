@@ -3,10 +3,21 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, ShoppingBag, Heart } from "lucide-react";
 
+interface Product {
+    id: string | number;
+    title: string;
+    price: string;
+    category: string;
+    rating: number;
+    image: string;
+    description?: string;
+    stock?: number;
+}
+
 interface QuickViewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    product: any;
+    product: Product;
 }
 
 export default function QuickViewModal({ isOpen, onClose, product }: QuickViewModalProps) {

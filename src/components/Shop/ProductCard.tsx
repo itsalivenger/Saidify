@@ -4,10 +4,11 @@ import { motion } from "framer-motion";
 import { Heart, ShoppingBag, Eye, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductCardProps {
     product: {
-        id: number;
+        id: string | number;
         title: string;
         price: string;
         image: string;
@@ -18,6 +19,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
+    const { toggleWishlist, isInWishlist } = useWishlist();
+    const isSaved = isInWishlist(String(product.id));
+
     return (
         <div className="group">
             <div className="relative overflow-hidden rounded-xl bg-neutral-100 aspect-[3/4] mb-4">
@@ -49,8 +53,22 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                 </div>
 
                 {/* Wishlist Button */}
-                <button className="absolute top-3 right-3 p-2 bg-white/50 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white text-black">
-                    <Heart className="w-5 h-5" />
+                <button
+                    onClick={() => toggleWishlist({
+                        id: String(product.id),
+                        title: product.title,
+                        price: product.price,
+                        image: product.image,
+                        category: product.category
+                    })}
+                    className={cn(
+                        "absolute top-3 right-3 p-2 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110",
+                        isSaved
+                            ? "bg-red-500 text-white opacity-100"
+                            : "bg-white/50 opacity-0 group-hover:opacity-100 hover:bg-white text-black"
+                    )}
+                >
+                    <Heart className={cn("w-5 h-5", isSaved && "fill-current")} />
                 </button>
             </div>
 

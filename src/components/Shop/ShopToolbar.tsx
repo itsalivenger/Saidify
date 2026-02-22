@@ -2,7 +2,21 @@
 
 import { Search, LayoutGrid, List } from "lucide-react";
 
-export default function ShopToolbar() {
+interface ShopToolbarProps {
+    searchQuery: string;
+    onSearchChange: (value: string) => void;
+    currentSort: string;
+    onSortChange: (value: string) => void;
+    totalProducts: number;
+}
+
+export default function ShopToolbar({
+    searchQuery,
+    onSearchChange,
+    currentSort,
+    onSortChange,
+    totalProducts
+}: ShopToolbarProps) {
     return (
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm mb-6">
             {/* Search */}
@@ -11,6 +25,8 @@ export default function ShopToolbar() {
                 <input
                     type="text"
                     placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => onSearchChange(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-primary/20 focus:outline-none placeholder:text-muted-foreground text-sm"
                 />
             </div>
@@ -19,11 +35,15 @@ export default function ShopToolbar() {
                 {/* Sort */}
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground whitespace-nowrap hidden sm:inline">Sort by:</span>
-                    <select className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer">
-                        <option>Newest Arrivals</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
-                        <option>Best Selling</option>
+                    <select
+                        value={currentSort}
+                        onChange={(e) => onSortChange(e.target.value)}
+                        className="bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm font-medium focus:outline-none cursor-pointer border border-neutral-200 dark:border-neutral-700 rounded-lg px-2 py-1"
+                    >
+                        <option value="Newest Arrivals" className="bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100">Newest Arrivals</option>
+                        <option value="Price: Low to High" className="bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100">Price: Low to High</option>
+                        <option value="Price: High to Low" className="bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100">Price: High to Low</option>
+                        <option value="Best Selling" className="bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100">Best Selling</option>
                     </select>
                 </div>
 

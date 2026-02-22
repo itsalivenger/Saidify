@@ -86,7 +86,7 @@ export async function POST(req: Request) {
         // Check if item exists in cart
         const existingItemIndex = user.cart.findIndex(
             (cartItem: any) =>
-                cartItem.productId === item.productId &&
+                String(cartItem.productId) === String(item.productId) &&
                 cartItem.selectedSize === item.selectedSize &&
                 cartItem.selectedColor === item.selectedColor
         );

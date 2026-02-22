@@ -1,10 +1,10 @@
-
 import { notFound } from "next/navigation";
-import { PRODUCTS } from "@/lib/products";
 import ProductGallery from "@/components/ProductPage/ProductGallery";
 import ProductInfo from "@/components/ProductPage/ProductInfo";
 import Breadcrumbs from "@/components/Shop/Breadcrumbs";
 import ProductCard from "@/components/Shop/ProductCard";
+import connectToDatabase from "@/lib/db";
+import Product from "@/models/Product";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -12,25 +12,57 @@ interface PageProps {
 
 export default async function ProductPage({ params }: PageProps) {
     const { id } = await params;
-    const product = PRODUCTS.find((p) => p.id === parseInt(id));
+
+    await connectToDatabase();
+
+    let product;
+    try {
+        product = await Product.findById(id).lean();
+    } catch (error) {
+        console.error("Error finding product:", error);
+        notFound();
+    }
 
     if (!product) {
         notFound();
     }
 
-    // Mock images for the gallery
-    const images = [
-        product.image,
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1529391409740-59f2dea98080?q=80&w=2600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?q=80&w=2576&auto=format&fit=crop",
-    ];
+    // Fetch related products from DB
+    const relatedProductsRaw = await Product.find({
+        category: product.category,
+        _id: { $ne: product._id }
+    })
+        .limit(4)
+        .lean();
 
-    // Filter related products (exclude current)
-    const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4);
+    const relatedProducts = relatedProductsRaw.map((p: any) => ({
+        id: p._id.toString(),
+        title: p.title,
+        price: `${p.price.toFixed(2)} MAD`,
+        category: p.category,
+        rating: p.rating || 0,
+        image: p.image
+    }));
+
+    // Format main product for component props
+    const formattedProduct = {
+        id: product._id.toString(),
+        title: product.title,
+        price: `${product.price.toFixed(2)} MAD`,
+        category: product.category,
+        rating: product.rating || 0,
+        image: product.image,
+        description: product.description,
+        sizes: product.sizes || [],
+        colors: product.colors || [],
+        stock: product.stock || 0
+    };
+
+    // For now we only have one image from the DB, but component expects an array
+    const images = [product.image];
 
     return (
-        <main className="min-h-screen bg-background py-8 md:py-12">
+        <main className="min-h-screen bg-transparent py-8 md:py-12">
             <div className="container mx-auto px-4 md:px-8 max-w-[1400px]">
                 <div className="mb-8">
                     <Breadcrumbs />
@@ -38,7 +70,7 @@ export default async function ProductPage({ params }: PageProps) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-24">
                     <ProductGallery images={images} title={product.title} />
-                    <ProductInfo product={product} />
+                    <ProductInfo product={formattedProduct} description={product.description} />
                 </div>
 
                 {/* Related Products */}
