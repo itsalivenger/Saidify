@@ -2,14 +2,31 @@
 
 import { motion } from "framer-motion";
 
-export default function Mission() {
+interface MissionProps {
+    data?: {
+        badge?: string;
+        title?: string;
+        description?: string;
+        bgImage?: string;
+    }
+}
+
+export default function Mission({ data }: MissionProps) {
+    const {
+        badge = "Our Mission",
+        title = "Redefining modern luxury for everyone.",
+        description = "We believe that style shouldn't come at the cost of sustainability or accessibility. Our goal is to create timeless pieces that empower you to express your unique self.",
+        bgImage = "https://images.unsplash.com/photo-1529333446532-8180249c56b0?q=80&w=2600&auto=format&fit=crop"
+    } = data || {};
+
     return (
         <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-            {/* Background Video/Image Placeholder */}
+            {/* Background Image CMS */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute inset-0 bg-black/60 z-10" />
                 <div
-                    className="w-full h-full bg-[url('https://images.unsplash.com/photo-1529333446532-8180249c56b0?q=80&w=2600&auto=format&fit=crop')] bg-cover bg-center"
+                    className="w-full h-full bg-cover bg-center transition-all duration-700"
+                    style={{ backgroundImage: `url('${bgImage}')` }}
                 />
             </div>
 

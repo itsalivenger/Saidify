@@ -33,6 +33,16 @@ export async function GET() {
             };
         }
 
+        // Ensure aboutPage structure exists for stability
+        if (!settings.aboutPage) {
+            settings.aboutPage = {
+                mission: { badge: "Our Mission", title: "Redefining modern luxury for everyone.", description: "We believe that style shouldn't come at the cost of sustainability or accessibility.", bgImage: "" },
+                story: { title: "Our Journey", timeline: [] },
+                values: [],
+                team: { title: "Meet the Team", subtitle: "The creative minds behind the brand.", members: [] }
+            };
+        }
+
         return NextResponse.json(settings);
     } catch (error) {
         console.error("Fetch settings error:", error);
@@ -50,17 +60,13 @@ export async function PUT(req: Request) {
         const body = await req.json();
         console.log("Saving settings update:", JSON.stringify(body, null, 2));
 
-        let settings = await SiteSettings.findOne();
-        if (!settings) {
-            settings = await SiteSettings.create({});
-        }
+        // Use findOneAndUpdate with $set to handle both flat objects and dot-notation keys
+        const settings = await SiteSettings.findOneAndUpdate(
+            {},
+            { $set: body },
+            { new: true, upsert: true, runValidators: false }
+        );
 
-        // Explicitly set each field to handle dot notation correctly in Mongoose
-        Object.keys(body).forEach(key => {
-            settings.set(key, body[key]);
-        });
-
-        await settings.save();
         console.log("Updated Social Links in DB:", JSON.stringify(settings?.mainSettings?.socialLinks, null, 2));
 
         return NextResponse.json(settings);

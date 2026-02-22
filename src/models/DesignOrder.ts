@@ -29,6 +29,7 @@ const DesignZoneSchema = new mongoose.Schema({
 
 const DesignOrderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+    name: { type: String, default: "" },
     blankProduct: { type: mongoose.Schema.Types.ObjectId, ref: "BlankProduct", required: true },
     selectedVariant: {
         color: { type: String, default: "" },
@@ -40,7 +41,7 @@ const DesignOrderSchema = new mongoose.Schema({
     thumbnail: { type: String, default: "" },   // composite preview for cart
     status: {
         type: String,
-        enum: ["draft", "pending", "in_production", "shipped", "delivered", "cancelled"],
+        enum: ["draft", "confirmed", "pending", "in_production", "shipped", "delivered", "cancelled"],
         default: "draft",
     },
     totalPrice: { type: Number, default: 0 },

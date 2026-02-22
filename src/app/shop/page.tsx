@@ -36,6 +36,7 @@ export default function ShopPage() {
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
     const [selectedSize, setSelectedSize] = useState("All");
     const [selectedColor, setSelectedColor] = useState("All");
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     useEffect(() => {
         setCategory(searchParams.get("category") || "All");
@@ -139,6 +140,8 @@ export default function ShopPage() {
                             currentSort={sort}
                             onSortChange={(val) => { setSort(val); setPage(1); }}
                             totalProducts={totalProducts}
+                            currentViewMode={viewMode}
+                            onViewModeChange={setViewMode}
                         />
                         {loading ? (
                             <div className="flex justify-center items-center h-64">
@@ -148,13 +151,15 @@ export default function ShopPage() {
                             <>
                                 <ShopGrid
                                     onQuickView={setQuickViewProduct}
+                                    viewMode={viewMode}
                                     products={products.map((p: Product) => ({
                                         id: p._id,
                                         title: p.title,
                                         price: `${p.price.toFixed(2)} MAD`,
                                         category: p.category,
                                         rating: p.rating,
-                                        image: p.image
+                                        image: p.image,
+                                        description: p.description
                                     }))}
                                 />
                                 <Pagination

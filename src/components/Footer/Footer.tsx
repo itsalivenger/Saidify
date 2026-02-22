@@ -33,7 +33,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className="space-y-6">
                         {info.logo ? (
-                            <img src={info.logo} alt={info.siteName} className="h-10 w-auto object-contain brightness-0 invert" />
+                            <img src={info.logo} alt={info.siteName} className="h-12 w-auto object-contain brightness-0 invert" />
                         ) : (
                             <h3 className="text-2xl font-black text-white tracking-tighter uppercase">{info.siteName || "Said Store"}</h3>
                         )}
@@ -68,11 +68,11 @@ export default function Footer() {
                     <div>
                         <h4 className="text-white font-bold mb-6">Shop</h4>
                         <ul className="space-y-4">
-                            <li><Link href="#" className="hover:text-white transition-colors">New Arrivals</Link></li>
-                            <li><Link href="/shop" className="hover:text-white transition-colors">Best Sellers</Link></li>
+                            <li><Link href="/shop?sort=Newest Arrivals" className="hover:text-white transition-colors">New Arrivals</Link></li>
+                            <li><Link href="/shop?sort=Best Selling" className="hover:text-white transition-colors">Best Sellers</Link></li>
                             <li><Link href="/design" className="hover:text-white transition-colors">Design Studio</Link></li>
                             <li><Link href="/categories" className="hover:text-white transition-colors">Categories</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Accessories</Link></li>
+                            <li><Link href="/shop?category=Accessories" className="hover:text-white transition-colors">Accessories</Link></li>
                         </ul>
                     </div>
 
@@ -80,23 +80,23 @@ export default function Footer() {
                     <div>
                         <h4 className="text-white font-bold mb-6">Company</h4>
                         <ul className="space-y-4">
-                            <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Sustainability</Link></li>
+                            <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+                            <li><Link href="/about#values" className="hover:text-white transition-colors">Our Values</Link></li>
+                            <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                            <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/about#mission" className="hover:text-white transition-colors">Sustainability</Link></li>
                         </ul>
                     </div>
 
-                    {/* Support Column - Moved to 4th column to balance layout since Newsletter is gone */}
+                    {/* Support Column */}
                     <div>
                         <h4 className="text-white font-bold mb-6">Support</h4>
                         <ul className="space-y-4">
-                            <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Order Status</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Shipping Info</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+                            <li><Link href="/contact" className="hover:text-white transition-colors">Help Center</Link></li>
+                            <li><Link href="/profile" className="hover:text-white transition-colors">Order Status</Link></li>
+                            <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
+                            <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
+                            <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>
                 </div>

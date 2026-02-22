@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingBag, Search, User, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, User, Heart, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useCart } from "@/context/CartContext";
@@ -117,7 +117,7 @@ export default function Navbar() {
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2 group relative z-10">
                             {settings?.mainSettings?.logo ? (
-                                <img src={settings.mainSettings.logo} alt={settings.mainSettings.siteName} className="h-8 md:h-10 w-auto object-contain" />
+                                <img src={settings.mainSettings.logo} alt={settings.mainSettings.siteName} className="h-10 md:h-12 w-auto object-contain" />
                             ) : (
                                 <>
                                     <div className="bg-black dark:bg-white text-white dark:text-black p-2 rounded-xl group-hover:rotate-6 transition-transform">
@@ -236,6 +236,12 @@ export default function Navbar() {
                                 </AnimatePresence>
                             </Link>
 
+                            {isAuthenticated && (
+                                <Link href="/profile/designs" className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent relative group" title="My Designs">
+                                    <Wand2 className="w-5 h-5" />
+                                </Link>
+                            )}
+
                             <Link
                                 href={isAuthenticated ? "/profile" : "/login"}
                                 className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent hidden sm:block flex items-center gap-2"
@@ -326,11 +332,29 @@ export default function Navbar() {
                                     transition={{ delay: (navLinks.length + 1) * 0.1 }}
                                 >
                                     <Link
+                                        href="/profile/designs"
+                                        className="text-2xl font-semibold text-foreground hover:text-primary block py-2 border-b border-muted flex items-center justify-between"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        My Designs
+                                        <Wand2 className="w-5 h-5 text-purple-600" />
+                                    </Link>
+                                </motion.div>
+                            )}
+
+                            {isAuthenticated && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: (navLinks.length + 2) * 0.1 }}
+                                >
+                                    <Link
                                         href="/profile"
-                                        className="text-2xl font-semibold text-foreground hover:text-primary block py-2 border-b border-muted"
+                                        className="text-2xl font-semibold text-foreground hover:text-primary block py-2 border-b border-muted flex items-center justify-between"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         My Profile
+                                        <User className="w-5 h-5 text-muted-foreground" />
                                     </Link>
                                 </motion.div>
                             )}

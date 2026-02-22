@@ -51,6 +51,36 @@ const SiteSettingsSchema = new mongoose.Schema({
             linkedin: { type: String, default: "" },
         },
     },
+    aboutPage: {
+        mission: {
+            badge: { type: String, default: "Our Mission" },
+            title: { type: String, default: "Redefining modern luxury for everyone." },
+            description: { type: String, default: "We believe that style shouldn't come at the cost of sustainability or accessibility. Our goal is to create timeless pieces that empower you to express your unique self." },
+            bgImage: { type: String, default: "https://images.unsplash.com/photo-1529333446532-8180249c56b0?q=80&w=2600&auto=format&fit=crop" },
+        },
+        story: {
+            title: { type: String, default: "Our Journey" },
+            timeline: [{
+                year: { type: String, default: "" },
+                title: { type: String, default: "" },
+                description: { type: String, default: "" },
+            }],
+        },
+        values: [{
+            title: { type: String, default: "" },
+            description: { type: String, default: "" },
+            iconName: { type: String, default: "Leaf" },
+        }],
+        team: {
+            title: { type: String, default: "Meet the Team" },
+            subtitle: { type: String, default: "The creative minds behind the brand." },
+            members: [{
+                name: { type: String, default: "" },
+                role: { type: String, default: "" },
+                image: { type: String, default: "" },
+            }],
+        },
+    },
 }, { timestamps: true });
 
 export default mongoose.models.SiteSettings || mongoose.model("SiteSettings", SiteSettingsSchema);

@@ -19,13 +19,17 @@ async function getUserId() {
     }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+// Next.js 15+: params is a Promise and must be awaited
+type RouteContext = { params: Promise<{ id: string }> };
+
+export async function PUT(req: Request, context: RouteContext) {
     try {
+        const { id } = await context.params;
         await connectToDatabase();
         const isAdminUser = await isAdmin();
         const body = await req.json();
 
-        let filter: any = { _id: params.id };
+        let filter: any = { _id: id };
 
         if (!isAdminUser) {
             const userId = await getUserId();
@@ -50,35 +54,35 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, context: RouteContext) {
     try {
+        const { id } = await context.params;
         await connectToDatabase();
         const isAdminUser = await isAdmin();
-
-        let filter: any = { _id: params.id };
 
         if (!isAdminUser) {
             const userId = await getUserId();
             if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-            filter.userId = userId;
         }
 
-        const design = await DesignOrder.findOneAndDelete(filter);
+        const design = await DesignOrder.findByIdAndDelete(id);
 
         if (!design) {
-            return NextResponse.json({ message: "Design not found or no permission" }, { status: 404 });
+            return NextResponse.json({ message: "Design not found" }, { status: 404 });
         }
 
         return NextResponse.json({ message: "Design deleted" });
     } catch (error) {
+        console.error("Delete design error:", error);
         return NextResponse.json({ message: "Error deleting design" }, { status: 500 });
     }
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: RouteContext) {
     try {
+        const { id } = await context.params;
         await connectToDatabase();
-        const design = await DesignOrder.findById(params.id).populate("blankProduct");
+        const design = await DesignOrder.findById(id).populate("blankProduct");
         if (!design) {
             return NextResponse.json({ message: "Design not found" }, { status: 404 });
         }

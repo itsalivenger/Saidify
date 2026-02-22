@@ -2,7 +2,18 @@
 
 import { motion } from "framer-motion";
 
-const TIMELINE = [
+interface StoryProps {
+    data?: {
+        title?: string;
+        timeline?: Array<{
+            year: string;
+            title: string;
+            description: string;
+        }>;
+    }
+}
+
+const DEFAULT_TIMELINE = [
     {
         year: "2020",
         title: "The Beginning",
@@ -25,12 +36,15 @@ const TIMELINE = [
     }
 ];
 
-export default function Story() {
+export default function Story({ data }: StoryProps) {
+    const title = data?.title || "Our Journey";
+    const timeline = data?.timeline?.length ? data.timeline : DEFAULT_TIMELINE;
+
     return (
         <section className="py-24 bg-background">
             <div className="container mx-auto px-4 md:px-8 max-w-6xl">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Journey</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">{title}</h2>
                     <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
                 </div>
 
@@ -39,7 +53,7 @@ export default function Story() {
                     <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-neutral-200 dark:bg-neutral-800 hidden md:block" />
 
                     <div className="space-y-12 md:space-y-24">
-                        {TIMELINE.map((item, index) => (
+                        {timeline.map((item, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}

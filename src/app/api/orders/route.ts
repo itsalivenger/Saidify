@@ -37,7 +37,7 @@ export async function POST(req: Request) {
             totalAmount,
             shippingAddress,
             paymentMethod,
-            status: "pending"
+            status: "confirmed"
         });
 
         // Clear user's cart after successful order

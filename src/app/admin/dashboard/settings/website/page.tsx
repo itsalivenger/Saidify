@@ -19,50 +19,121 @@ import {
     Settings,
     Phone,
     MapPin,
-    Globe
+    Globe,
+    Target,
+    History,
+    Heart,
+    Users,
+    AlertCircle,
+    CheckCircle2,
+    TrendingUp,
+    Search,
+    Zap,
+    Package
 } from 'lucide-react';
+import { cn } from "@/lib/utils";
+
+const ICONS = ['Leaf', 'Award', 'Heart', 'ShieldCheck', 'Users', 'Target', 'Globe', 'Zap', 'Star', 'Smile'];
 
 const TABS = [
     { id: 'home', label: 'Home Page', icon: Layout },
+    { id: 'about', label: 'About Page', icon: Users },
+    { id: 'collections', label: 'Collections', icon: Package },
     { id: 'general', label: 'General Settings', icon: Settings },
 ];
 
+interface Product {
+    _id: string;
+    title: string;
+    image: string;
+    category: string;
+    isBestSeller: boolean;
+    isNewArrival: boolean;
+    featured: boolean;
+}
+
 export default function WebsiteControlPage() {
     const [activeTab, setActiveTab] = useState('home');
+    const [activeAboutSection, setActiveAboutSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
     const [settings, setSettings] = useState<any>(null);
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [productLoading, setProductLoading] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [savedTab, setSavedTab] = useState<string | null>(null);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [uploadingField, setUploadingField] = useState<string | null>(null);
+    const [productSearchQuery, setProductSearchQuery] = useState('');
+    const [updatingProductId, setUpdatingProductId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const currentUploadField = useRef<string | null>(null);
 
     useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await fetch('/api/settings');
-                if (res.ok) {
-                    const data = await res.json();
-                    setSettings(data);
-                }
-            } catch (err) {
-                console.error('Error fetching settings', err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchSettings();
+        fetchProducts();
     }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch('/api/settings', { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json();
+
+                // Initialize aboutPage if missing or incomplete
+                if (!data.aboutPage) {
+                    data.aboutPage = {
+                        mission: { badge: "Our Mission", title: "Redefining modern luxury for everyone.", description: "...", bgImage: "" },
+                        story: { title: "Our Journey", timeline: [] },
+                        values: [],
+                        team: { title: "Meet the Team", subtitle: "...", members: [] }
+                    };
+                } else {
+                    if (!data.aboutPage.mission) data.aboutPage.mission = { badge: "", title: "", description: "", bgImage: "" };
+                    if (!data.aboutPage.story) data.aboutPage.story = { title: "", timeline: [] };
+                    if (!data.aboutPage.values) data.aboutPage.values = [];
+                    if (!data.aboutPage.team) data.aboutPage.team = { title: "", subtitle: "", members: [] };
+                }
+
+                setSettings(data);
+            }
+        } catch (err) {
+            console.error('Error fetching settings', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchProducts = async () => {
+        setProductLoading(true);
+        try {
+            const res = await fetch('/api/products?limit=100');
+            if (res.ok) {
+                const data = await res.json();
+                setProducts(data.products);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setProductLoading(false);
+        }
+    };
 
     const handleSave = async (section: string) => {
         setSaving(true);
+        setMessage(null);
         try {
             const token = localStorage.getItem('adminToken');
             const payload: any = {};
-            if (section === 'hero') payload['homepage.hero'] = settings.homepage.hero;
-            if (section === 'promo') payload['homepage.promoBanner'] = settings.homepage.promoBanner;
-            if (section === 'newsletter') payload['homepage.newsletter'] = settings.homepage.newsletter;
-            if (section === 'testimonials') payload['homepage.testimonials'] = settings.homepage.testimonials;
+
+            if (section === 'homepage') payload['homepage'] = settings.homepage;
+            if (section === 'aboutPage') payload['aboutPage'] = settings.aboutPage;
+            if (section === 'mainSettings') {
+                payload['mainSettings.siteName'] = settings.mainSettings.siteName;
+                payload['mainSettings.logo'] = settings.mainSettings.logo;
+                payload['mainSettings.contactEmail'] = settings.mainSettings.contactEmail;
+                payload['mainSettings.contactPhone'] = settings.mainSettings.contactPhone;
+                payload['mainSettings.address'] = settings.mainSettings.address;
+                payload['mainSettings.socialLinks'] = settings.mainSettings.socialLinks;
+            }
 
             const res = await fetch('/api/settings', {
                 method: 'PUT',
@@ -74,11 +145,15 @@ export default function WebsiteControlPage() {
             });
 
             if (res.ok) {
-                setSavedTab(section);
-                setTimeout(() => setSavedTab(null), 2000);
+                setMessage({ type: 'success', text: `${section === 'homepage' ? 'Home' : section === 'aboutPage' ? 'About' : 'General'} settings saved successfully!` });
+                setTimeout(() => setMessage(null), 3000);
+            } else {
+                const data = await res.json();
+                setMessage({ type: 'error', text: `Error: ${data.message || res.statusText}` });
             }
         } catch (err) {
             console.error('Save error', err);
+            setMessage({ type: 'error', text: 'An unexpected error occurred during save.' });
         } finally {
             setSaving(false);
         }
@@ -102,6 +177,7 @@ export default function WebsiteControlPage() {
                     if (field === 'hero.image') updated.homepage.hero.image = url;
                     if (field === 'promo.image') updated.homepage.promoBanner.image = url;
                     if (field === 'mainSettings.logo') updated.mainSettings.logo = url;
+                    if (field === 'about.mission.bgImage') updated.aboutPage.mission.bgImage = url;
                     return updated;
                 });
             }
@@ -113,6 +189,7 @@ export default function WebsiteControlPage() {
         }
     };
 
+    // Helper functions for updating state
     const updateHero = (key: string, value: string) => {
         setSettings((prev: any) => ({
             ...prev,
@@ -155,6 +232,13 @@ export default function WebsiteControlPage() {
         });
     };
 
+    const removeTestimonial = (index: number) => {
+        setSettings((prev: any) => {
+            const updated = prev.homepage.testimonials.filter((_: any, i: number) => i !== index);
+            return { ...prev, homepage: { ...prev.homepage, testimonials: updated } };
+        });
+    };
+
     const updateGeneral = (key: string, value: string) => {
         setSettings((prev: any) => ({
             ...prev,
@@ -172,67 +256,80 @@ export default function WebsiteControlPage() {
         }));
     };
 
-    const removeTestimonial = (index: number) => {
+    // About Page Helpers
+    const updateAboutNested = (section: string, field: string, value: any) => {
+        setSettings((prev: any) => ({
+            ...prev,
+            aboutPage: {
+                ...prev.aboutPage,
+                [section]: {
+                    ...prev.aboutPage[section],
+                    [field]: value
+                }
+            }
+        }));
+    };
+
+    const addAboutItem = (section: 'story' | 'values' | 'team', defaultValue: any) => {
         setSettings((prev: any) => {
-            const updated = prev.homepage.testimonials.filter((_: any, i: number) => i !== index);
-            return { ...prev, homepage: { ...prev.homepage, testimonials: updated } };
+            const aboutPage = { ...prev.aboutPage };
+            if (section === 'story') {
+                aboutPage.story.timeline = [...aboutPage.story.timeline, defaultValue];
+            } else if (section === 'values') {
+                aboutPage.values = [...aboutPage.values, defaultValue];
+            } else if (section === 'team') {
+                aboutPage.team.members = [...aboutPage.team.members, defaultValue];
+            }
+            return { ...prev, aboutPage };
         });
     };
 
-    const handleSaveGeneral = async () => {
-        setSaving(true);
-        try {
-            const token = localStorage.getItem('adminToken');
-
-            console.log("Saving mainSettings:", settings.mainSettings);
-
-            const res = await fetch('/api/settings', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ mainSettings: settings.mainSettings }),
-            });
-
-            if (res.ok) {
-                setSavedTab('general');
-                setTimeout(() => setSavedTab(null), 2000);
-            } else {
-                const data = await res.json();
-                alert(`Error saving general settings: ${data.message || res.statusText}`);
+    const removeAboutItem = (section: 'story' | 'values' | 'team', index: number) => {
+        setSettings((prev: any) => {
+            const aboutPage = { ...prev.aboutPage };
+            if (section === 'story') {
+                aboutPage.story.timeline = aboutPage.story.timeline.filter((_: any, i: number) => i !== index);
+            } else if (section === 'values') {
+                aboutPage.values = aboutPage.values.filter((_: any, i: number) => i !== index);
+            } else if (section === 'team') {
+                aboutPage.team.members = aboutPage.team.members.filter((_: any, i: number) => i !== index);
             }
-        } catch (err) {
-            console.error('Save error', err);
-        } finally {
-            setSaving(false);
-        }
+            return { ...prev, aboutPage };
+        });
     };
 
-    const handleSaveHome = async () => {
-        setSaving(true);
+    const updateAboutItem = (section: 'story' | 'values' | 'team', index: number, field: string, value: any) => {
+        setSettings((prev: any) => {
+            const aboutPage = { ...prev.aboutPage };
+            if (section === 'story') {
+                aboutPage.story.timeline[index] = { ...aboutPage.story.timeline[index], [field]: value };
+            } else if (section === 'values') {
+                aboutPage.values[index] = { ...aboutPage.values[index], [field]: value };
+            } else if (section === 'team') {
+                aboutPage.team.members[index] = { ...aboutPage.team.members[index], [field]: value };
+            }
+            return { ...prev, aboutPage };
+        });
+    };
+
+    const toggleProductStatus = async (productId: string, field: string, currentValue: boolean) => {
+        setUpdatingProductId(`${productId}-${field}`);
         try {
-            const token = localStorage.getItem('adminToken');
-            const res = await fetch('/api/settings', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ homepage: settings.homepage }),
+            const res = await fetch(`/api/products/${productId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [field]: !currentValue })
             });
 
             if (res.ok) {
-                setSavedTab('home');
-                setTimeout(() => setSavedTab(null), 2000);
-            } else {
-                const data = await res.json();
-                alert(`Error saving home page changes: ${data.message || res.statusText}`);
+                setProducts(products.map(p =>
+                    p._id === productId ? { ...p, [field]: !currentValue } : p
+                ));
             }
-        } catch (err) {
-            console.error('Save error', err);
+        } catch (error) {
+            console.error('Error updating status:', error);
         } finally {
-            setSaving(false);
+            setUpdatingProductId(null);
         }
     };
 
@@ -245,7 +342,7 @@ export default function WebsiteControlPage() {
     }
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <div className="p-8 max-w-5xl mx-auto pb-32">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -255,21 +352,44 @@ export default function WebsiteControlPage() {
             />
 
             {/* Header */}
-            <div className="mb-10">
-                <h1 className="text-4xl font-black mb-2">Website Control</h1>
-                <p className="text-muted-foreground">Manage the content displayed on your storefront pages.</p>
+            <div className="mb-10 flex justify-between items-start">
+                <div>
+                    <h1 className="text-4xl font-black mb-2">Website Control</h1>
+                    <p className="text-muted-foreground">Manage your storefront's content and appearance.</p>
+                </div>
+                {/* Save Button is now sticky at the bottom but we can keep a primary one here if needed or just use the floating one */}
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2 mb-8 flex-wrap">
+            {/* Notification */}
+            <AnimatePresence>
+                {message && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className={cn(
+                            "mb-6 p-4 rounded-2xl flex items-center gap-3 border shadow-lg font-bold sticky top-4 z-[60]",
+                            message.type === 'success' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                        )}
+                    >
+                        {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                        {message.text}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Global Tabs */}
+            <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit mb-10">
                 {TABS.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all ${activeTab === tab.id
-                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                            : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-muted-foreground hover:text-foreground'
-                            }`}
+                        className={cn(
+                            "flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-black transition-all",
+                            activeTab === tab.id
+                                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                                : "text-gray-500 hover:text-gray-300"
+                        )}
                     >
                         <tab.icon className="w-4 h-4" />
                         {tab.label}
@@ -277,11 +397,10 @@ export default function WebsiteControlPage() {
                 ))}
             </div>
 
-            {/* Content Panels */}
+            {/* Content Tabs */}
             <AnimatePresence mode="wait">
                 {activeTab === 'home' && settings && (
-                    <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12 pb-20">
-                        {/* Hero Section */}
+                    <motion.div key="home" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-12">
                         <SectionCard title="Hero Section" description="The main banner at the top of the homepage.">
                             <div>
                                 <Label>Hero Image</Label>
@@ -311,7 +430,6 @@ export default function WebsiteControlPage() {
                             </div>
                         </SectionCard>
 
-                        {/* Promo Banner */}
                         <SectionCard title="Promo Banner" description="The promotional section with a countdown timer.">
                             <div className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-white/5 rounded-2xl">
                                 <div>
@@ -325,7 +443,6 @@ export default function WebsiteControlPage() {
                                     <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${settings.homepage.promoBanner.active ? 'left-7' : 'left-1'}`} />
                                 </button>
                             </div>
-
                             <div>
                                 <Label>Background Image</Label>
                                 <div
@@ -345,7 +462,6 @@ export default function WebsiteControlPage() {
                                     </div>
                                 </div>
                             </div>
-
                             <div className="grid grid-cols-2 gap-4">
                                 <Field label="Main Title" value={settings.homepage.promoBanner.title} onChange={(v) => updatePromo('title', v)} placeholder="e.g. End of Season" />
                                 <Field label="Subtitle / Highlight" value={settings.homepage.promoBanner.subtitle} onChange={(v) => updatePromo('subtitle', v)} placeholder="e.g. Clearance Sale" />
@@ -354,13 +470,11 @@ export default function WebsiteControlPage() {
                             <Field label="CTA Button Text" value={settings.homepage.promoBanner.ctaText} onChange={(v) => updatePromo('ctaText', v)} placeholder="e.g. Shop The Sale" />
                         </SectionCard>
 
-                        {/* Newsletter */}
                         <SectionCard title="Newsletter Section" description="The email subscription section at the bottom of the homepage.">
                             <Field label="Headline" value={settings.homepage.newsletter.title} onChange={(v) => updateNewsletter('title', v)} placeholder="e.g. Join the Club" />
                             <Field label="Subtitle" value={settings.homepage.newsletter.subtitle} onChange={(v) => updateNewsletter('subtitle', v)} placeholder="Enter the newsletter subtext" multiline />
                         </SectionCard>
 
-                        {/* Testimonials */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between mb-2">
                                 <div>
@@ -371,9 +485,8 @@ export default function WebsiteControlPage() {
                                     <Plus className="w-4 h-4" /> Add Review
                                 </button>
                             </div>
-
                             {settings.homepage.testimonials.map((t: any, i: number) => (
-                                <div key={i} className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl p-6 space-y-4">
+                                <div key={i} className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl p-6 space-y-4 shadow-sm group relative">
                                     <div className="flex items-center justify-between">
                                         <div className="flex gap-1">
                                             {[1, 2, 3, 4, 5].map(star => (
@@ -382,7 +495,7 @@ export default function WebsiteControlPage() {
                                                 </button>
                                             ))}
                                         </div>
-                                        <button onClick={() => removeTestimonial(i)} className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors">
+                                        <button onClick={() => removeTestimonial(i)} className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -395,25 +508,319 @@ export default function WebsiteControlPage() {
                             ))}
                         </div>
 
-                        {/* Sticky Save Bar */}
-                        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-                            <button
-                                onClick={handleSaveHome}
-                                disabled={saving}
-                                className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-2xl ${savedTab === 'home'
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-purple-600 text-white hover:bg-purple-700 hover:scale-105 active:scale-95'
-                                    } disabled:opacity-50`}
-                            >
-                                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : savedTab === 'home' ? <Check className="w-5 h-5" /> : <Save className="w-5 h-5" />}
-                                {savedTab === 'home' ? 'Home Page Saved!' : 'Save Home Page Changes'}
-                            </button>
+                        <SaveButton onClick={() => handleSave('homepage')} saving={saving} label="Save Home Page" />
+                    </motion.div>
+                )}
+
+                {activeTab === 'about' && settings && (
+                    <motion.div key="about" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-10">
+                        {/* Sub-Tabs for About Section */}
+                        <div className="flex flex-wrap gap-2 p-1.5 bg-neutral-100 dark:bg-white/5 rounded-2xl border border-neutral-200 dark:border-white/10 w-fit">
+                            {[
+                                { id: 'mission', label: 'Mission', icon: Target },
+                                { id: 'story', label: 'Our Story', icon: History },
+                                { id: 'values', label: 'Values', icon: Heart },
+                                { id: 'team', label: 'Team', icon: Users },
+                            ].map((subTab) => (
+                                <button
+                                    key={subTab.id}
+                                    onClick={() => setActiveAboutSection(subTab.id as any)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] uppercase tracking-widest font-black transition-all",
+                                        activeAboutSection === subTab.id
+                                            ? "bg-white dark:bg-neutral-800 text-purple-600 shadow-sm"
+                                            : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                    )}
+                                >
+                                    <subTab.icon className="w-3.5 h-3.5" />
+                                    {subTab.label}
+                                </button>
+                            ))}
                         </div>
+
+                        <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2.5rem] p-8 shadow-sm">
+                            {/* About - Mission */}
+                            {activeAboutSection === 'mission' && (
+                                <div className="space-y-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-6">
+                                            <Field label="Badge Text" value={settings.aboutPage.mission.badge} onChange={(v) => updateAboutNested('mission', 'badge', v)} placeholder="e.g. Our Mission" />
+                                            <Field label="Hero Title" value={settings.aboutPage.mission.title} onChange={(v) => updateAboutNested('mission', 'title', v)} placeholder="Main headline..." />
+                                            <div>
+                                                <Label>Mission BG Image</Label>
+                                                <div
+                                                    className="relative mt-2 aspect-video w-full rounded-2xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 overflow-hidden cursor-pointer group hover:border-purple-500/50 transition-all bg-neutral-50 dark:bg-white/5"
+                                                    onClick={() => { currentUploadField.current = 'about.mission.bgImage'; fileInputRef.current?.click(); }}
+                                                >
+                                                    {settings.aboutPage.mission.bgImage ? (
+                                                        <img src={settings.aboutPage.mission.bgImage} alt="Mission BG" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                                                            <ImageIcon className="w-10 h-10" />
+                                                            <p className="text-xs font-medium">Upload mission background</p>
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        {uploadingField === 'about.mission.bgImage' ? <Loader2 className="w-8 h-8 text-white animate-spin" /> : <Upload className="w-8 h-8 text-white" />}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Field label="Mission Description" value={settings.aboutPage.mission.description} onChange={(v) => updateAboutNested('mission', 'description', v)} placeholder="Tell your mission..." multiline />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* About - Story */}
+                            {activeAboutSection === 'story' && (
+                                <div className="space-y-8">
+                                    <Field label="Section Title" value={settings.aboutPage.story.title} onChange={(v) => updateAboutNested('story', 'title', v)} placeholder="Our Journey..." />
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Timeline Events</label>
+                                        {settings.aboutPage.story.timeline.map((item: any, idx: number) => (
+                                            <div key={idx} className="p-6 bg-neutral-50 dark:bg-white/5 border border-neutral-100 dark:border-white/5 rounded-3xl flex flex-col md:flex-row gap-6 items-start relative group shadow-sm">
+                                                <div className="w-24 shrink-0">
+                                                    <input
+                                                        type="text"
+                                                        value={item.year}
+                                                        onChange={(e) => updateAboutItem('story', idx, 'year', e.target.value)}
+                                                        className="w-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl px-3 py-2 text-xs font-black text-center text-purple-600 dark:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all shadow-sm"
+                                                        placeholder="Year"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 space-y-3">
+                                                    <input
+                                                        type="text"
+                                                        value={item.title}
+                                                        onChange={(e) => updateAboutItem('story', idx, 'title', e.target.value)}
+                                                        className="w-full bg-transparent border-none text-foreground font-black text-lg p-0 focus:ring-0"
+                                                        placeholder="Event Title..."
+                                                    />
+                                                    <textarea
+                                                        value={item.description}
+                                                        onChange={(e) => updateAboutItem('story', idx, 'description', e.target.value)}
+                                                        className="w-full bg-transparent border-none text-muted-foreground text-sm p-0 focus:ring-0 resize-none"
+                                                        placeholder="Description..."
+                                                        rows={2}
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={() => removeAboutItem('story', idx)}
+                                                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            onClick={() => addAboutItem('story', { year: '2025', title: 'New Event', description: '' })}
+                                            className="w-full border-2 border-dashed border-neutral-200 dark:border-white/5 rounded-3xl py-8 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all group"
+                                        >
+                                            <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" /> Add Timeline Milestone
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* About - Values */}
+                            {activeAboutSection === 'values' && (
+                                <div className="space-y-10">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {settings.aboutPage.values.map((value: any, idx: number) => (
+                                            <div key={idx} className="p-6 bg-neutral-50 dark:bg-white/5 border border-neutral-100 dark:border-white/5 rounded-3xl space-y-4 group relative shadow-sm">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-white dark:bg-neutral-800 rounded-2xl flex items-center justify-center relative overflow-hidden group-hover:bg-purple-600 transition-all border border-neutral-200 dark:border-neutral-700 shadow-sm">
+                                                        <select
+                                                            value={value.iconName}
+                                                            onChange={(e) => updateAboutItem('values', idx, 'iconName', e.target.value)}
+                                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                        >
+                                                            {ICONS.map(icon => <option key={icon} value={icon}>{icon}</option>)}
+                                                        </select>
+                                                        <span className="text-xs font-black group-hover:text-white transition-colors">{value.iconName[0]}</span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <input
+                                                            type="text"
+                                                            value={value.title}
+                                                            onChange={(e) => updateAboutItem('values', idx, 'title', e.target.value)}
+                                                            className="w-full bg-transparent border-none text-foreground font-black p-0 focus:ring-0"
+                                                            placeholder="Value Title..."
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeAboutItem('values', idx)}
+                                                        className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                                <textarea
+                                                    value={value.description}
+                                                    onChange={(e) => updateAboutItem('values', idx, 'description', e.target.value)}
+                                                    className="w-full bg-transparent border-none text-muted-foreground text-xs p-0 focus:ring-0 resize-none font-medium leading-relaxed"
+                                                    placeholder="Value description..."
+                                                    rows={3}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => addAboutItem('values', { title: 'New Value', description: '', iconName: 'Leaf' })}
+                                        className="w-full border-2 border-dashed border-neutral-200 dark:border-white/5 rounded-3xl py-12 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all group"
+                                    >
+                                        <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" /> Add Core Value
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* About - Team */}
+                            {activeAboutSection === 'team' && (
+                                <div className="space-y-10">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 border-b border-neutral-100 dark:border-neutral-800">
+                                        <Field label="Section Title" value={settings.aboutPage.team.title} onChange={(v) => updateAboutNested('team', 'title', v)} placeholder="Meet the Team" />
+                                        <Field label="Section Subtitle" value={settings.aboutPage.team.subtitle} onChange={(v) => updateAboutNested('team', 'subtitle', v)} placeholder="The creative minds..." />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {settings.aboutPage.team.members.map((member: any, idx: number) => (
+                                            <div key={idx} className="p-6 bg-neutral-50 dark:bg-white/5 border border-neutral-100 dark:border-white/5 rounded-3xl flex items-center gap-6 group relative shadow-sm">
+                                                <div className="w-16 h-16 bg-neutral-200 dark:bg-neutral-800 rounded-2xl overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-700 shadow-inner">
+                                                    {member.image ? (
+                                                        <img src={member.image} className="w-full h-full object-cover" alt="" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground/30"><ImageIcon className="w-6 h-6" /></div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 space-y-1.5">
+                                                    <input
+                                                        type="text"
+                                                        value={member.name}
+                                                        onChange={(e) => updateAboutItem('team', idx, 'name', e.target.value)}
+                                                        className="w-full bg-transparent border-none text-foreground font-black p-0 focus:ring-0 text-sm"
+                                                        placeholder="Name"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={member.role}
+                                                        onChange={(e) => updateAboutItem('team', idx, 'role', e.target.value)}
+                                                        className="w-full bg-transparent border-none text-purple-600 dark:text-purple-400 font-black p-0 focus:ring-0 text-[9px] uppercase tracking-widest"
+                                                        placeholder="Role"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={member.image}
+                                                        onChange={(e) => updateAboutItem('team', idx, 'image', e.target.value)}
+                                                        className="w-full bg-transparent border-none text-neutral-400 font-mono p-0 focus:ring-0 text-[8px] truncate"
+                                                        placeholder="Image URL..."
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={() => removeAboutItem('team', idx)}
+                                                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => addAboutItem('team', { name: '', role: '', image: '' })}
+                                        className="w-full border-2 border-dashed border-neutral-200 dark:border-white/5 rounded-3xl py-12 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-neutral-50 dark:hover:bg-white/5 hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all group"
+                                    >
+                                        <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" /> Add Team Member
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <SaveButton onClick={() => handleSave('aboutPage')} saving={saving} label="Save About Page" />
+                    </motion.div>
+                )}
+
+                {activeTab === 'collections' && (
+                    <motion.div key="collections" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-8">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h1 className="text-2xl font-black">Collections Management</h1>
+                                <p className="text-gray-400 text-sm">Control which products appear in special collections.</p>
+                            </div>
+
+                            <div className="relative group max-w-xs w-full">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-purple-500 transition-colors" />
+                                <input
+                                    type="text"
+                                    placeholder="Search products..."
+                                    value={productSearchQuery}
+                                    onChange={(e) => setProductSearchQuery(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                                />
+                            </div>
+                        </div>
+
+                        {productLoading ? (
+                            <div className="flex justify-center py-20">
+                                <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {products
+                                    .filter(p => p.title.toLowerCase().includes(productSearchQuery.toLowerCase()) || p.category.toLowerCase().includes(productSearchQuery.toLowerCase()))
+                                    .map((product) => (
+                                        <div key={product._id} className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl overflow-hidden group shadow-sm">
+                                            <div className="aspect-[16/10] relative overflow-hidden">
+                                                <img src={product.image} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                <div className="absolute top-3 left-3 flex gap-2">
+                                                    {product.featured && <span className="bg-amber-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Featured</span>}
+                                                    {product.isBestSeller && <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Best Seller</span>}
+                                                </div>
+                                            </div>
+
+                                            <div className="p-5 space-y-4">
+                                                <div>
+                                                    <p className="text-[9px] font-black text-purple-500 uppercase tracking-widest mb-1">{product.category}</p>
+                                                    <h3 className="font-bold text-sm truncate">{product.title}</h3>
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-2 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                                                    <SectionToggle
+                                                        productId={product._id}
+                                                        field="featured"
+                                                        value={product.featured}
+                                                        icon={Star}
+                                                        label="Featured"
+                                                        updatingId={updatingProductId}
+                                                        onToggle={toggleProductStatus}
+                                                    />
+                                                    <SectionToggle
+                                                        productId={product._id}
+                                                        field="isBestSeller"
+                                                        value={product.isBestSeller}
+                                                        icon={TrendingUp}
+                                                        label="Best Seller"
+                                                        updatingId={updatingProductId}
+                                                        onToggle={toggleProductStatus}
+                                                    />
+                                                    <SectionToggle
+                                                        productId={product._id}
+                                                        field="isNewArrival"
+                                                        value={product.isNewArrival}
+                                                        icon={Zap}
+                                                        label="New"
+                                                        updatingId={updatingProductId}
+                                                        onToggle={toggleProductStatus}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        )}
                     </motion.div>
                 )}
 
                 {activeTab === 'general' && settings && (
-                    <motion.div key="general" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8 pb-20">
+                    <motion.div key="general" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-12">
                         <SectionCard title="Brand Identity" description="Core brand elements like site name and contact details.">
                             <div className="mb-6">
                                 <Label>Store Logo</Label>
@@ -453,25 +860,7 @@ export default function WebsiteControlPage() {
                             </div>
                         </SectionCard>
 
-                        <div className="p-8 bg-amber-500/10 border border-amber-500/20 rounded-3xl">
-                            <h3 className="text-lg font-black text-amber-500 mb-2">Advanced Settings</h3>
-                            <p className="text-sm text-amber-500/80">More configuration options (currencies, taxes, logic) are coming soon to this section.</p>
-                        </div>
-
-                        {/* Sticky Save Bar */}
-                        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-                            <button
-                                onClick={handleSaveGeneral}
-                                disabled={saving}
-                                className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-lg transition-all shadow-2xl ${savedTab === 'general'
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-purple-600 text-white hover:bg-purple-700 hover:scale-105 active:scale-95'
-                                    } disabled:opacity-50`}
-                            >
-                                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : savedTab === 'general' ? <Check className="w-5 h-5" /> : <Save className="w-5 h-5" />}
-                                {savedTab === 'general' ? 'General Settings Saved!' : 'Save General Changes'}
-                            </button>
-                        </div>
+                        <SaveButton onClick={() => handleSave('mainSettings')} saving={saving} label="Save General Settings" />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -483,31 +872,73 @@ export default function WebsiteControlPage() {
 
 function SectionCard({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
     return (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-3xl p-8 space-y-6">
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2.5rem] p-8 space-y-8 shadow-sm">
             <div className="pb-6 border-b border-neutral-100 dark:border-neutral-800">
                 <h2 className="text-2xl font-black">{title}</h2>
-                <p className="text-sm text-muted-foreground mt-1">{description}</p>
+                <p className="text-sm text-muted-foreground mt-1 font-medium">{description}</p>
             </div>
             {children}
         </div>
     );
 }
 
+function SaveButton({ onClick, saving, label }: { onClick: () => void; saving: boolean; label: string }) {
+    return (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+            <button
+                onClick={onClick}
+                disabled={saving}
+                className="flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white px-10 py-5 rounded-[2rem] font-black text-lg transition-all shadow-[0_20px_40px_rgba(147,51,234,0.3)] disabled:opacity-50 hover:scale-105 active:scale-95 group"
+            >
+                {saving ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                    <Save className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                )}
+                {saving ? 'Processing...' : label}
+            </button>
+        </div>
+    );
+}
+
+function SectionToggle({ productId, field, value, icon: Icon, label, updatingId, onToggle }: any) {
+    const isUpdating = updatingId === `${productId}-${field}`;
+    return (
+        <button
+            onClick={() => onToggle(productId, field, value)}
+            disabled={isUpdating}
+            className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all border",
+                value
+                    ? "bg-purple-600 border-purple-500 text-white shadow-md shadow-purple-600/20"
+                    : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            )}
+        >
+            {isUpdating ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+                <Icon className={cn("w-3 h-3", value ? "text-white" : "text-gray-500")} />
+            )}
+            {label}
+        </button>
+    );
+}
+
 function Label({ children }: { children: React.ReactNode }) {
-    return <label className="block text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-1.5">{children}</label>;
+    return <label className="block text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2">{children}</label>;
 }
 
 function Field({ label, value, onChange, placeholder, multiline }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; multiline?: boolean }) {
     return (
-        <div>
+        <div className="space-y-2">
             <Label>{label}</Label>
             {multiline ? (
                 <textarea
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all resize-none font-medium text-sm"
+                    rows={4}
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all resize-none font-medium text-sm leading-relaxed"
                 />
             ) : (
                 <input
@@ -515,11 +946,9 @@ function Field({ label, value, onChange, placeholder, multiline }: { label: stri
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium text-sm"
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium text-sm"
                 />
             )}
         </div>
     );
 }
-
-

@@ -16,7 +16,8 @@ import {
     User as UserIcon,
     ChevronLeft,
     Users,
-    Palette
+    Palette,
+    Package
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -29,8 +30,10 @@ export default function AdminDashboardLayout({
     const pathname = usePathname();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isProductsOpen, setIsProductsOpen] = useState(pathname.includes('/products'));
+    const [isOrdersOpen, setIsOrdersOpen] = useState(pathname.includes('/orders'));
     const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.includes('/settings'));
     const [isDesignerOpen, setIsDesignerOpen] = useState(pathname.includes('/blanks'));
+    const [isWebsiteOpen, setIsWebsiteOpen] = useState(pathname.includes('/website') || pathname.includes('/about'));
     const [adminUser, setAdminUser] = useState<any>(null);
 
     useEffect(() => {
@@ -62,7 +65,16 @@ export default function AdminDashboardLayout({
                 { name: 'Categories', path: '/admin/dashboard/products/categories' },
             ]
         },
-        { name: 'Collections', icon: Globe, path: '/admin/dashboard/website' },
+        {
+            name: 'Orders',
+            icon: Package,
+            isDropdown: true,
+            stateKey: 'orders',
+            options: [
+                { name: 'Regular Orders', path: '/admin/dashboard/orders/regular' },
+                { name: 'Custom Orders', path: '/admin/dashboard/orders/custom' },
+            ]
+        },
         { name: 'Clients', icon: Users, path: '/admin/dashboard/clients' },
         {
             name: 'Custom Designer',
@@ -72,7 +84,6 @@ export default function AdminDashboardLayout({
             options: [
                 { name: 'Blank Products', path: '/admin/dashboard/blanks' },
                 { name: 'Add Blank Product', path: '/admin/dashboard/blanks/new' },
-                { name: 'Custom Orders', path: '/admin/dashboard/custom-orders' },
             ]
         },
         { name: 'Website Control', icon: Settings, path: '/admin/dashboard/settings/website' },
@@ -88,8 +99,30 @@ export default function AdminDashboardLayout({
         const hasActiveChild = item.options?.some((opt: any) => pathname === opt.path);
 
         if (item.isDropdown) {
-            const isOpen = item.stateKey === 'settings' ? isSettingsOpen : item.stateKey === 'designer' ? isDesignerOpen : isProductsOpen;
-            const toggleOpen = item.stateKey === 'settings' ? () => setIsSettingsOpen(!isSettingsOpen) : item.stateKey === 'designer' ? () => setIsDesignerOpen(!isDesignerOpen) : () => setIsProductsOpen(!isProductsOpen);
+            const getIsOpen = () => {
+                switch (item.stateKey) {
+                    case 'products': return isProductsOpen;
+                    case 'orders': return isOrdersOpen;
+                    case 'designer': return isDesignerOpen;
+                    case 'website': return isWebsiteOpen;
+                    case 'settings': return isSettingsOpen;
+                    default: return false;
+                }
+            };
+
+            const getToggle = () => {
+                switch (item.stateKey) {
+                    case 'products': return () => setIsProductsOpen(!isProductsOpen);
+                    case 'orders': return () => setIsOrdersOpen(!isOrdersOpen);
+                    case 'designer': return () => setIsDesignerOpen(!isDesignerOpen);
+                    case 'website': return () => setIsWebsiteOpen(!isWebsiteOpen);
+                    case 'settings': return () => setIsSettingsOpen(!isSettingsOpen);
+                    default: return () => { };
+                }
+            };
+
+            const isOpen = getIsOpen();
+            const toggleOpen = getToggle();
             return (
                 <div className="px-3 py-1">
                     <button

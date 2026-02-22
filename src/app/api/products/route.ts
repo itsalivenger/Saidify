@@ -40,11 +40,11 @@ export async function GET(req: Request) {
         }
 
         if (size && size !== 'All') {
-            query.sizes = size;
+            query.sizes = { $regex: `^${size}$`, $options: 'i' };
         }
 
         if (color && color !== 'All') {
-            query['colors.name'] = color;
+            query['colors.name'] = { $regex: `^${color}$`, $options: 'i' };
         }
 
         const skip = (page - 1) * limit;

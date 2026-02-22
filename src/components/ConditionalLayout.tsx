@@ -7,10 +7,8 @@ import Footer from '@/components/Footer/Footer';
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isAdmin = pathname?.startsWith('/admin');
-    const isDesign = pathname?.startsWith('/design');
-
-    if (isAdmin || isDesign) {
-        // No navbar, no footer, no padding for admin and design studio
+    if (isAdmin) {
+        // No navbar, no footer, no padding for admin
         return <>{children}</>;
     }
 

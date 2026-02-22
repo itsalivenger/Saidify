@@ -35,6 +35,8 @@ export async function generateMetadata() {
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ConfirmProvider } from "@/context/ConfirmContext";
+import WhatsAppButton from "@/components/Common/WhatsAppButton";
 
 export default function RootLayout({
   children,
@@ -47,11 +49,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <ConditionalLayout>{children}</ConditionalLayout>
-            </WishlistProvider>
-          </CartProvider>
+          <ConfirmProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <ConditionalLayout>{children}</ConditionalLayout>
+                <WhatsAppButton />
+              </WishlistProvider>
+            </CartProvider>
+          </ConfirmProvider>
         </AuthProvider>
       </body>
     </html>

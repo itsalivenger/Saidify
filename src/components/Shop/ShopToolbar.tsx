@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, LayoutGrid, List } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ShopToolbarProps {
     searchQuery: string;
@@ -8,6 +9,8 @@ interface ShopToolbarProps {
     currentSort: string;
     onSortChange: (value: string) => void;
     totalProducts: number;
+    currentViewMode: 'grid' | 'list';
+    onViewModeChange: (mode: 'grid' | 'list') => void;
 }
 
 export default function ShopToolbar({
@@ -15,7 +18,9 @@ export default function ShopToolbar({
     onSearchChange,
     currentSort,
     onSortChange,
-    totalProducts
+    totalProducts,
+    currentViewMode,
+    onViewModeChange
 }: ShopToolbarProps) {
     return (
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm mb-6">
@@ -49,10 +54,26 @@ export default function ShopToolbar({
 
                 {/* View Toggle */}
                 <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
-                    <button className="p-1.5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-primary">
+                    <button
+                        onClick={() => onViewModeChange('grid')}
+                        className={cn(
+                            "p-1.5 rounded-md transition-all",
+                            currentViewMode === 'grid'
+                                ? "bg-white dark:bg-neutral-700 shadow-sm text-primary"
+                                : "text-muted-foreground hover:text-foreground"
+                        )}
+                    >
                         <LayoutGrid className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 rounded-md text-muted-foreground hover:text-foreground transition-colors">
+                    <button
+                        onClick={() => onViewModeChange('list')}
+                        className={cn(
+                            "p-1.5 rounded-md transition-all",
+                            currentViewMode === 'list'
+                                ? "bg-white dark:bg-neutral-700 shadow-sm text-primary"
+                                : "text-muted-foreground hover:text-foreground"
+                        )}
+                    >
                         <List className="w-4 h-4" />
                     </button>
                 </div>

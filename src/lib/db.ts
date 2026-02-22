@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/site_said";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/Pentabrood";
 
 if (!MONGODB_URI) {
     throw new Error(
@@ -27,9 +27,13 @@ async function connectToDatabase() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
+            dbName: 'Pentabrood',
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+        console.log("Connecting to MongoDB:", MONGODB_URI.split('@')[1] || MONGODB_URI, "DB:", opts.dbName);
+
+        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+            console.log("MongoDB Connected Successfully to:", mongoose.connection.name);
             return mongoose;
         });
     }
