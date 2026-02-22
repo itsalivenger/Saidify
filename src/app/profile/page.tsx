@@ -13,6 +13,7 @@ import {
     User as UserIcon,
     ArrowRight,
     Loader2,
+    Wand2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -88,28 +89,40 @@ export default function ProfilePage() {
                             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-primary/20">
                                 <UserIcon className="w-10 h-10 text-primary" />
                             </div>
-                            <h3 className="text-xl font-black truncate">{user.name}</h3>
-                            <p className="text-sm text-muted-foreground truncate mb-1">{user.email}</p>
-                            {user.phone && <p className="text-xs font-bold text-neutral-400">{user.phone}</p>}
+                            <h3 className="text-xl font-black truncate">{user?.name}</h3>
+                            <p className="text-sm text-muted-foreground truncate mb-1">{user?.email}</p>
+                            {user?.phone && <p className="text-xs font-bold text-neutral-400">{user.phone}</p>}
                         </div>
 
                         {[
                             { id: "orders", label: "My Orders", icon: Package },
+                            { id: "designs", label: "My Designs", icon: Wand2, href: "/profile/designs" },
                             { id: "settings", label: "Settings", icon: Settings },
                         ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={cn(
-                                    "w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all",
-                                    activeTab === tab.id
-                                        ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
-                                        : "hover:bg-neutral-100 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground"
-                                )}
-                            >
-                                <tab.icon className="w-5 h-5" />
-                                {tab.label}
-                            </button>
+                            tab.href ? (
+                                <Link
+                                    key={tab.id}
+                                    href={tab.href}
+                                    className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all hover:bg-neutral-100 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground"
+                                >
+                                    <tab.icon className="w-5 h-5" />
+                                    {tab.label}
+                                </Link>
+                            ) : (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={cn(
+                                        "w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all",
+                                        activeTab === tab.id
+                                            ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
+                                            : "hover:bg-neutral-100 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground"
+                                    )}
+                                >
+                                    <tab.icon className="w-5 h-5" />
+                                    {tab.label}
+                                </button>
+                            )
                         ))}
 
                         <button
@@ -226,20 +239,20 @@ export default function ProfilePage() {
                                             <div className="space-y-1.5">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Full Name</label>
                                                 <div className="bg-neutral-100 dark:bg-neutral-900 px-6 py-4 rounded-2xl font-bold border border-transparent focus-within:border-neutral-200 dark:focus-within:border-neutral-800 transition-colors">
-                                                    {user.name}
+                                                    {user?.name}
                                                 </div>
                                             </div>
                                             <div className="space-y-1.5">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Email</label>
                                                 <div className="bg-neutral-100 dark:bg-neutral-900 px-6 py-4 rounded-2xl font-bold text-neutral-400 border border-transparent italic">
-                                                    {user.email}
+                                                    {user?.email}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400 ml-1">Phone Number</label>
                                             <div className="bg-neutral-100 dark:bg-neutral-900 px-6 py-4 rounded-2xl font-bold border border-transparent italic">
-                                                {user.phone || "Not provided"}
+                                                {user?.phone || "Not provided"}
                                             </div>
                                         </div>
                                         <div className="pt-8">

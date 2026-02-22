@@ -88,7 +88,8 @@ export async function POST(req: Request) {
             (cartItem: any) =>
                 String(cartItem.productId) === String(item.productId) &&
                 cartItem.selectedSize === item.selectedSize &&
-                cartItem.selectedColor === item.selectedColor
+                cartItem.selectedColor === item.selectedColor &&
+                String(cartItem.designOrderId) === String(item.designOrderId)
         );
 
         if (existingItemIndex > -1) {

@@ -2,44 +2,56 @@
 
 import { motion } from "framer-motion";
 import { Mail, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Newsletter() {
     const [email, setEmail] = useState("");
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [message, setMessage] = useState("");
+    const [data, setData] = useState({
+        title: "Join the Club",
+        subtitle: "Subscribe to our newsletter and get 10% off your first order plus exclusive access to new drops.",
+    });
+
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(r => r.json())
+            .then(settings => {
+                if (settings?.homepage?.newsletter) {
+                    setData(prev => ({ ...prev, ...settings.homepage.newsletter }));
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus("loading");
-
         try {
             const res = await fetch("/api/newsletter", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
             });
-
-            const data = await res.json();
-
+            const responseData = await res.json();
             if (res.ok) {
                 setStatus("success");
-                setMessage(data.message);
+                setMessage(responseData.message);
                 setEmail("");
             } else {
                 setStatus("error");
-                setMessage(data.message || "Something went wrong.");
+                setMessage(responseData.message || "Something went wrong.");
             }
         } catch (error) {
             setStatus("error");
             setMessage("Failed to subscribe. Please try again.");
         }
     };
+
     return (
         <section className="py-24 bg-background">
             <div className="w-full px-4 md:px-8 max-w-4xl mx-auto">
                 <div className="bg-neutral-900 dark:bg-neutral-50 rounded-3xl p-8 md:p-16 text-center relative overflow-hidden">
-
                     {/* Decorative circles */}
                     <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
@@ -61,7 +73,7 @@ export default function Newsletter() {
                             transition={{ delay: 0.1 }}
                             className="text-3xl font-bold tracking-tight text-white dark:text-black sm:text-4xl mb-4"
                         >
-                            Join the Club
+                            {data.title}
                         </motion.h2>
 
                         <motion.p
@@ -71,7 +83,7 @@ export default function Newsletter() {
                             transition={{ delay: 0.2 }}
                             className="text-lg text-neutral-400 dark:text-neutral-600 mb-10 max-w-lg mx-auto"
                         >
-                            Subscribe to our newsletter and get 10% off your first order plus exclusive access to new drops.
+                            {data.subtitle}
                         </motion.p>
 
                         <motion.div
@@ -80,10 +92,7 @@ export default function Newsletter() {
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
                         >
-                            <form
-                                className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto relative"
-                                onSubmit={handleSubscribe}
-                            >
+                            <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto relative" onSubmit={handleSubscribe}>
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
@@ -110,7 +119,7 @@ export default function Newsletter() {
                         </motion.div>
 
                         <p className="mt-6 text-xs text-neutral-500">
-                            By subscribing you agree to our Terms & Conditions.
+                            By subscribing you agree to our Terms &amp; Conditions.
                         </p>
                     </div>
                 </div>

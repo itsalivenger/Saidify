@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/db';
 import Product from '@/models/Product';
+import { isAdmin } from '@/lib/auth';
 
 export async function GET(
     request: Request,
@@ -28,6 +29,9 @@ export async function PATCH(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
         await connectToDatabase();
         const { id } = await params;
         const body = await request.json();
@@ -41,6 +45,30 @@ export async function PATCH(
         return NextResponse.json(product);
     } catch (error) {
         console.error('Error updating product:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+        await connectToDatabase();
+        const { id } = await params;
+
+        const product = await Product.findByIdAndDelete(id);
+
+        if (!product) {
+            return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting product:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

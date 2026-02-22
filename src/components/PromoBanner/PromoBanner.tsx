@@ -3,25 +3,36 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Timer } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function PromoBanner() {
-    const [timeLeft, setTimeLeft] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
+    const [data, setData] = useState({
+        title: "End of Season",
+        subtitle: "Clearance Sale",
+        description: "Save up to 50% on selected premium styles. Don't miss out on the biggest deals of the year.",
+        image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2574&auto=format&fit=crop",
+        ctaText: "Shop The Sale",
+        active: true,
     });
 
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
     useEffect(() => {
-        // Set a fixed end date 3 days from now for demo purposes
+        fetch('/api/settings')
+            .then(r => r.json())
+            .then(settings => {
+                if (settings?.homepage?.promoBanner) {
+                    setData(prev => ({ ...prev, ...settings.homepage.promoBanner }));
+                }
+            })
+            .catch(() => { });
+    }, []);
+
+    useEffect(() => {
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 3);
-
         const timer = setInterval(() => {
             const now = new Date();
             const difference = endDate.getTime() - now.getTime();
-
             if (difference > 0) {
                 setTimeLeft({
                     days: Math.floor(difference / (1000 * 60 * 60 * 24)),
@@ -33,9 +44,10 @@ export default function PromoBanner() {
                 clearInterval(timer);
             }
         }, 1000);
-
         return () => clearInterval(timer);
     }, []);
+
+    if (!data.active) return null;
 
     const timeUnits = [
         { label: "Days", value: timeLeft.days },
@@ -47,8 +59,11 @@ export default function PromoBanner() {
     return (
         <section className="py-24 px-4 md:px-8">
             <div className="w-full max-w-[1800px] mx-auto relative overflow-hidden rounded-3xl bg-neutral-900 text-white dark:bg-neutral-50 dark:text-black">
-                {/* Background Pattern/Gradient */}
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay" />
+                {/* Background */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
+                    style={{ backgroundImage: `url('${data.image}')` }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-neutral-900/90 to-transparent dark:from-neutral-50 dark:via-neutral-50/90" />
 
                 <div className="relative z-10 grid lg:grid-cols-2 gap-12 p-12 md:p-24 items-center">
@@ -70,9 +85,9 @@ export default function PromoBanner() {
                             transition={{ delay: 0.1 }}
                             className="text-4xl md:text-6xl font-black tracking-tight"
                         >
-                            End of Season
+                            {data.title}
                             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 dark:from-blue-600 dark:to-purple-700">
-                                Clearance Sale
+                                {data.subtitle}
                             </span>
                         </motion.h2>
 
@@ -83,7 +98,7 @@ export default function PromoBanner() {
                             transition={{ delay: 0.2 }}
                             className="text-lg md:text-xl text-neutral-300 dark:text-neutral-600 max-w-lg"
                         >
-                            Save up to 50% on selected premium styles. Don't miss out on the biggest deals of the year.
+                            {data.description}
                         </motion.p>
 
                         <motion.button
@@ -95,7 +110,7 @@ export default function PromoBanner() {
                             whileTap={{ scale: 0.95 }}
                             className="group bg-white text-black dark:bg-black dark:text-white px-8 py-4 rounded-full font-bold text-lg flex items-center gap-3 shadow-lg hover:shadow-xl transition-all"
                         >
-                            Shop The Sale
+                            {data.ctaText}
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </motion.button>
                     </div>

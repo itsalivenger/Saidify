@@ -1,36 +1,19 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import connectToDatabase from "@/lib/db";
 import User from "@/models/User";
-
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this";
-
-// Simple Admin check
-async function isAdmin() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) return false;
-
-    try {
-        const decoded: any = jwt.verify(token, JWT_SECRET);
-        return decoded.role === "admin";
-    } catch (error) {
-        return false;
-    }
-}
+import { isAdmin } from "@/lib/auth";
 
 export async function GET(req: Request) {
     try {
         if (!(await isAdmin())) {
+            console.log("Admin check failed in GET /api/admin/users");
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         await connectToDatabase();
 
-        // Fetch users, but exclude their hashed passwords for security
-        const users = await User.find({ role: "user" }).select("-password").sort({ createdAt: -1 });
+        // Fetch users who are NOT admins, excluding their passwords
+        const users = await User.find({ role: { $ne: "admin" } }).select("-password").sort({ createdAt: -1 });
 
         return NextResponse.json(users);
     } catch (error) {

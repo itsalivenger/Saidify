@@ -12,8 +12,12 @@ import {
     Loader2,
     ToggleLeft,
     ToggleRight,
-    AlertCircle
+    AlertCircle,
+    Image as ImageIcon,
+    Upload
 } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { useRef } from 'react';
 
 interface Category {
     _id: string;
@@ -21,6 +25,7 @@ interface Category {
     slug: string;
     active: boolean;
     description?: string;
+    image?: string;
 }
 
 export default function CategoriesPage() {
@@ -33,8 +38,11 @@ export default function CategoriesPage() {
     const [formData, setFormData] = useState({
         name: '',
         active: true,
-        description: ''
+        description: '',
+        image: ''
     });
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchCategories();
@@ -72,7 +80,7 @@ export default function CategoriesPage() {
                 await fetchCategories();
                 setIsAdding(false);
                 setEditingId(null);
-                setFormData({ name: '', active: true, description: '' });
+                setFormData({ name: '', active: true, description: '', image: '' });
             }
         } catch (error) {
             console.error('Error saving category:', error);
@@ -102,9 +110,40 @@ export default function CategoriesPage() {
         setFormData({
             name: cat.name,
             active: cat.active,
-            description: cat.description || ''
+            description: cat.description || '',
+            image: cat.image || ''
         });
         setIsAdding(true);
+    };
+
+    const uploadFile = async (file: File) => {
+        setUploading(true);
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadData,
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setFormData(prev => ({ ...prev, image: data.url }));
+            } else {
+                alert('Upload failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Error uploading image.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) uploadFile(file);
     };
 
     return (
@@ -128,7 +167,7 @@ export default function CategoriesPage() {
                         onClick={() => {
                             setIsAdding(true);
                             setEditingId(null);
-                            setFormData({ name: '', active: true, description: '' });
+                            setFormData({ name: '', active: true, description: '', image: '' });
                         }}
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20"
                     >
@@ -175,8 +214,8 @@ export default function CategoriesPage() {
                                         type="button"
                                         onClick={() => setFormData({ ...formData, active: !formData.active })}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${formData.active
-                                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                                                : 'bg-red-500/10 border-red-500/20 text-red-400'
+                                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                            : 'bg-red-500/10 border-red-500/20 text-red-400'
                                             }`}
                                     >
                                         {formData.active ? <ToggleRight /> : <ToggleLeft />}
@@ -196,6 +235,51 @@ export default function CategoriesPage() {
                                 />
                             </div>
 
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Category Image</label>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                />
+                                <div className="flex gap-4 items-start">
+                                    <div
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className={cn(
+                                            "flex-1 aspect-[21/9] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all",
+                                            formData.image
+                                                ? "bg-neutral-900 border-neutral-800"
+                                                : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-purple-500/50"
+                                        )}
+                                    >
+                                        {formData.image ? (
+                                            <div className="relative w-full h-full p-2 group">
+                                                <img src={formData.image} alt="Preview" className="w-full h-full object-cover rounded-xl" />
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-xl">
+                                                    <Edit2 className="w-5 h-5" />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {uploading ? <Loader2 className="w-6 h-6 animate-spin text-purple-500" /> : <Upload className="w-6 h-6 text-gray-500" />}
+                                                <p className="text-xs text-gray-500 font-medium">Click to upload collection banner</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    {formData.image && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, image: '' })}
+                                            className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all shadow-lg shadow-red-500/5"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
                             <div className="md:col-span-2 flex justify-end gap-3">
                                 <button
                                     type="button"
@@ -206,10 +290,10 @@ export default function CategoriesPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={loading}
-                                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-8 rounded-xl transition-all shadow-lg"
+                                    disabled={loading || uploading}
+                                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-8 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                                    {loading || uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                     {editingId ? 'Update Category' : 'Create Category'}
                                 </button>
                             </div>
@@ -230,23 +314,29 @@ export default function CategoriesPage() {
                         {/* Background Decoration */}
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/5 blur-[40px] rounded-full group-hover:bg-purple-600/10 transition-all" />
 
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-purple-600/10 rounded-xl">
-                                <Tag className="w-6 h-6 text-purple-500" />
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => startEdit(cat)}
-                                    className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                                >
-                                    <Edit2 className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(cat._id)}
-                                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/5 rounded-lg transition-all"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                        <div className="mb-4">
+                            <div className="aspect-[21/9] rounded-xl overflow-hidden mb-4 bg-neutral-900 border border-white/5 relative">
+                                {cat.image ? (
+                                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-purple-600/5">
+                                        <Tag className="w-8 h-8 text-purple-500/20" />
+                                    </div>
+                                )}
+                                <div className="absolute top-2 right-2 flex gap-1">
+                                    <button
+                                        onClick={() => startEdit(cat)}
+                                        className="p-1.5 bg-black/60 text-white/70 hover:text-white hover:bg-black/80 backdrop-blur-md rounded-lg transition-all border border-white/10"
+                                    >
+                                        <Edit2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(cat._id)}
+                                        className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 backdrop-blur-md rounded-lg transition-all border border-red-500/20"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

@@ -15,7 +15,8 @@ import {
     Settings,
     User as UserIcon,
     ChevronLeft,
-    Users
+    Users,
+    Palette
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -28,6 +29,8 @@ export default function AdminDashboardLayout({
     const pathname = usePathname();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isProductsOpen, setIsProductsOpen] = useState(pathname.includes('/products'));
+    const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.includes('/settings'));
+    const [isDesignerOpen, setIsDesignerOpen] = useState(pathname.includes('/blanks'));
     const [adminUser, setAdminUser] = useState<any>(null);
 
     useEffect(() => {
@@ -52,14 +55,27 @@ export default function AdminDashboardLayout({
             name: 'Products',
             icon: ShoppingCart,
             isDropdown: true,
+            stateKey: 'products',
             options: [
                 { name: 'Add Product', path: '/admin/dashboard/products/1' },
-                { name: 'All Products', path: '/admin/dashboard/products/2' },
+                { name: 'Inventory Control', path: '/admin/dashboard/products/master' },
                 { name: 'Categories', path: '/admin/dashboard/products/categories' },
             ]
         },
         { name: 'Collections', icon: Globe, path: '/admin/dashboard/website' },
         { name: 'Clients', icon: Users, path: '/admin/dashboard/clients' },
+        {
+            name: 'Custom Designer',
+            icon: Palette,
+            isDropdown: true,
+            stateKey: 'designer',
+            options: [
+                { name: 'Blank Products', path: '/admin/dashboard/blanks' },
+                { name: 'Add Blank Product', path: '/admin/dashboard/blanks/new' },
+                { name: 'Custom Orders', path: '/admin/dashboard/custom-orders' },
+            ]
+        },
+        { name: 'Website Control', icon: Settings, path: '/admin/dashboard/settings/website' },
     ];
 
     const sidebarVariants = {
@@ -72,21 +88,23 @@ export default function AdminDashboardLayout({
         const hasActiveChild = item.options?.some((opt: any) => pathname === opt.path);
 
         if (item.isDropdown) {
+            const isOpen = item.stateKey === 'settings' ? isSettingsOpen : item.stateKey === 'designer' ? isDesignerOpen : isProductsOpen;
+            const toggleOpen = item.stateKey === 'settings' ? () => setIsSettingsOpen(!isSettingsOpen) : item.stateKey === 'designer' ? () => setIsDesignerOpen(!isDesignerOpen) : () => setIsProductsOpen(!isProductsOpen);
             return (
                 <div className="px-3 py-1">
                     <button
-                        onClick={() => setIsProductsOpen(!isProductsOpen)}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 group ${isProductsOpen || hasActiveChild
+                        onClick={toggleOpen}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 group ${isOpen || hasActiveChild
                             ? 'bg-purple-600/10 text-white border border-purple-500/20'
                             : 'text-gray-400 hover:bg-white/5 hover:text-white'
                             }`}
                     >
                         <div className="flex items-center gap-3">
-                            <item.icon className={`w-6 h-6 ${(isProductsOpen || hasActiveChild) ? 'text-purple-500' : 'group-hover:text-purple-400'} transition-colors`} />
+                            <item.icon className={`w-6 h-6 ${(isOpen || hasActiveChild) ? 'text-purple-500' : 'group-hover:text-purple-400'} transition-colors`} />
                             <span className="font-medium whitespace-nowrap">{item.name}</span>
                         </div>
                         <motion.div
-                            animate={{ rotate: isProductsOpen ? 180 : 0 }}
+                            animate={{ rotate: isOpen ? 180 : 0 }}
                             transition={{ duration: 0.2 }}
                         >
                             <ChevronDown className="w-4 h-4" />
@@ -94,7 +112,7 @@ export default function AdminDashboardLayout({
                     </button>
 
                     <AnimatePresence>
-                        {isProductsOpen && (
+                        {isOpen && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
@@ -153,16 +171,16 @@ export default function AdminDashboardLayout({
             >
                 {/* Logo Section */}
                 <div className="h-20 flex items-center justify-between px-6 border-b border-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-600/20">
+                    <Link href="/" className="flex items-center gap-3 group" title="Back to website">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-600/20 group-hover:scale-105 transition-transform">
                             <Globe className="text-white w-6 h-6" />
                         </div>
                         <motion.span
-                            className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
+                            className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent group-hover:from-purple-400 group-hover:to-blue-400 transition-all"
                         >
                             ADM.SAID
                         </motion.span>
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Navigation Items */}

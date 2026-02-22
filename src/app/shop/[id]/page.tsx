@@ -5,6 +5,7 @@ import Breadcrumbs from "@/components/Shop/Breadcrumbs";
 import ProductCard from "@/components/Shop/ProductCard";
 import connectToDatabase from "@/lib/db";
 import Product from "@/models/Product";
+import BlankProduct from "@/models/BlankProduct";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -15,12 +16,24 @@ export default async function ProductPage({ params }: PageProps) {
 
     await connectToDatabase();
 
-    let product;
+    let product: any;
     try {
         product = await Product.findById(id).lean();
+        if (!product) {
+            const blank = await BlankProduct.findById(id).lean();
+            if (blank) {
+                product = {
+                    ...blank,
+                    _id: blank._id,
+                    title: blank.name,
+                    price: blank.basePrice,
+                    isBlank: true,
+                    image: blank.views?.[0]?.mockupImage || ""
+                };
+            }
+        }
     } catch (error) {
         console.error("Error finding product:", error);
-        notFound();
     }
 
     if (!product) {
@@ -55,7 +68,8 @@ export default async function ProductPage({ params }: PageProps) {
         description: product.description,
         sizes: product.sizes || [],
         colors: product.colors || [],
-        stock: product.stock || 0
+        stock: product.stock || 0,
+        isBlank: product.isBlank
     };
 
     // For now we only have one image from the DB, but component expects an array

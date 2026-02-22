@@ -1,37 +1,43 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TESTIMONIALS = [
-    {
-        id: 1,
-        content: "The quality of the fabrics is outstanding. I've washed my hoodie multiple times and it still feels brand new. fast shipping too!",
-        author: "Alex Morgan",
-        role: "Verified Buyer",
-        rating: 5,
-        avatarColor: "bg-blue-100 text-blue-600",
-    },
-    {
-        id: 2,
-        content: "I love the minimalist aesthetic of the new collection. It fits perfectly into my wardrobe. Definitely buying more.",
-        author: "Sarah Chen",
-        role: "Fashion Blogger",
-        rating: 5,
-        avatarColor: "bg-purple-100 text-purple-600",
-    },
-    {
-        id: 3,
-        content: "Customer service was incredibly helpful when I needed to exchange for a different size. The process was seamless.",
-        author: "Michael Ross",
-        role: "Loyal Customer",
-        rating: 4,
-        avatarColor: "bg-emerald-100 text-emerald-600",
-    },
+const DEFAULT_TESTIMONIALS = [
+    { id: 1, content: "The quality of the fabrics is outstanding. I've washed my hoodie multiple times and it still feels brand new. Fast shipping too!", author: "Alex Morgan", role: "Verified Buyer", rating: 5, avatarColor: "bg-blue-100 text-blue-600" },
+    { id: 2, content: "I love the minimalist aesthetic of the new collection. It fits perfectly into my wardrobe. Definitely buying more.", author: "Sarah Chen", role: "Fashion Blogger", rating: 5, avatarColor: "bg-purple-100 text-purple-600" },
+    { id: 3, content: "Customer service was incredibly helpful when I needed to exchange for a different size. The process was seamless.", author: "Michael Ross", role: "Loyal Customer", rating: 4, avatarColor: "bg-emerald-100 text-emerald-600" },
+];
+
+const AVATAR_COLORS = [
+    "bg-blue-100 text-blue-600",
+    "bg-purple-100 text-purple-600",
+    "bg-emerald-100 text-emerald-600",
+    "bg-rose-100 text-rose-600",
+    "bg-amber-100 text-amber-600",
 ];
 
 export default function Testimonials() {
+    const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
+
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(r => r.json())
+            .then(settings => {
+                if (settings?.homepage?.testimonials?.length > 0) {
+                    const mapped = settings.homepage.testimonials.map((t: any, i: number) => ({
+                        ...t,
+                        id: t._id || i,
+                        avatarColor: AVATAR_COLORS[i % AVATAR_COLORS.length],
+                    }));
+                    setTestimonials(mapped);
+                }
+            })
+            .catch(() => { });
+    }, []);
+
     return (
         <section className="py-24 bg-muted/30">
             <div className="w-full px-4 md:px-8 max-w-[1400px] mx-auto">
@@ -57,7 +63,7 @@ export default function Testimonials() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {TESTIMONIALS.map((testimonial, index) => (
+                    {testimonials.map((testimonial, index) => (
                         <motion.div
                             key={testimonial.id}
                             initial={{ opacity: 0, y: 20 }}
@@ -81,7 +87,7 @@ export default function Testimonials() {
                             </div>
 
                             <p className="text-lg text-foreground/80 mb-8 leading-relaxed">
-                                "{testimonial.content}"
+                                &ldquo;{testimonial.content}&rdquo;
                             </p>
 
                             <div className="flex items-center gap-4">

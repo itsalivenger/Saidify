@@ -7,7 +7,6 @@ import {
     Search,
     ShoppingCart,
     Package,
-    ChevronRight,
     Mail,
     Calendar,
     ArrowUpRight
@@ -26,19 +25,25 @@ interface User {
 export default function ClientsPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // We'll create this API next
+                setLoading(true);
+                setError(null);
                 const res = await fetch('/api/admin/users');
                 if (res.ok) {
                     const data = await res.json();
                     setUsers(data);
+                } else {
+                    const errorData = await res.json().catch(() => ({}));
+                    setError(errorData.message || 'Failed to fetch users');
                 }
             } catch (error) {
                 console.error("Failed to fetch users", error);
+                setError('A network error occurred while fetching users');
             } finally {
                 setLoading(false);
             }
@@ -48,8 +53,8 @@ export default function ClientsPage() {
     }, []);
 
     const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        (user.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (user.email?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -72,13 +77,23 @@ export default function ClientsPage() {
                 </div>
             </div>
 
+            {error && (
+                <div className="bg-rose-500/10 border border-rose-500/20 text-rose-600 p-6 rounded-3xl mb-8 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold">!</div>
+                    <div>
+                        <h3 className="font-bold">Error loading customers</h3>
+                        <p className="text-sm opacity-80">{error}</p>
+                    </div>
+                </div>
+            )}
+
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3, 4, 5, 6].map(i => (
                         <div key={i} className="h-48 rounded-3xl bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
                     ))}
                 </div>
-            ) : filteredUsers.length === 0 ? (
+            ) : error ? null : filteredUsers.length === 0 ? (
                 <div className="text-center py-20 bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border-2 border-dashed border-neutral-200 dark:border-neutral-800">
                     <Users className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
                     <h3 className="text-xl font-bold">No customers found</h3>
@@ -96,11 +111,11 @@ export default function ClientsPage() {
                             <div className="flex items-start justify-between mb-6">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 flex items-center justify-center border border-purple-500/20">
                                     <span className="text-lg font-black text-purple-600">
-                                        {user.name.charAt(0).toUpperCase()}
+                                        {user.name?.charAt(0).toUpperCase() || '?'}
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
-                                    {user.cart.length > 0 && (
+                                    {user.cart?.length > 0 && (
                                         <div className="px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-wider">
                                             Active Cart
                                         </div>
@@ -110,7 +125,7 @@ export default function ClientsPage() {
 
                             <div className="space-y-4 mb-8">
                                 <div>
-                                    <h3 className="text-lg font-black group-hover:text-purple-500 transition-colors">{user.name}</h3>
+                                    <h3 className="text-lg font-black group-hover:text-purple-500 transition-colors">{user.name || 'Anonymous User'}</h3>
                                     <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
                                         <Mail className="w-3.5 h-3.5" />
                                         <span className="truncate">{user.email}</span>
@@ -122,14 +137,14 @@ export default function ClientsPage() {
                                         <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1">
                                             <ShoppingCart className="w-3 h-3" /> Cart
                                         </div>
-                                        <p className="text-lg font-black">{user.cart.length} <span className="text-xs font-medium text-neutral-500">items</span></p>
+                                        <p className="text-lg font-black">{user.cart?.length || 0} <span className="text-xs font-medium text-neutral-500">items</span></p>
                                     </div>
                                     <div className="w-px h-8 bg-neutral-100 dark:bg-neutral-800" />
                                     <div className="flex-1">
                                         <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1">
                                             <Calendar className="w-3 h-3" /> Member
                                         </div>
-                                        <p className="text-lg font-black">{new Date(user.createdAt).getFullYear()}</p>
+                                        <p className="text-lg font-black">{user.createdAt ? new Date(user.createdAt).getFullYear() : 'N/A'}</p>
                                     </div>
                                 </div>
                             </div>

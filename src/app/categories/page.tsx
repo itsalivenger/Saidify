@@ -10,6 +10,7 @@ interface Category {
     _id: string;
     name: string;
     active: boolean;
+    image?: string;
 }
 
 export default function CategoriesPage() {
@@ -64,9 +65,13 @@ export default function CategoriesPage() {
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                                    {/* Placeholder representation */}
+                                    {/* Image or Placeholder */}
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <Layers className="w-20 h-20 text-neutral-300 dark:text-neutral-700 opacity-20 group-hover:scale-110 transition-transform duration-500" />
+                                        {cat.image ? (
+                                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        ) : (
+                                            <Layers className="w-20 h-20 text-neutral-300 dark:text-neutral-700 opacity-20 group-hover:scale-110 transition-transform duration-500" />
+                                        )}
                                     </div>
 
                                     <div className="absolute inset-x-0 bottom-0 p-8 z-20">

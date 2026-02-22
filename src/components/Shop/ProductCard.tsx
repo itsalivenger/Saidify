@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, ShoppingBag, Eye, Star } from "lucide-react";
+import { Heart, ShoppingBag, Eye, Star, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
@@ -14,6 +14,7 @@ interface ProductCardProps {
         image: string;
         category: string;
         rating: number;
+        isBlank?: boolean;
     };
     onQuickView?: (product: any) => void;
 }
@@ -32,6 +33,12 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                 </Link>
+
+                {product.isBlank && (
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg z-10">
+                        Customizable
+                    </div>
+                )}
 
                 {/* Overlay Actions */}
                 <div className="absolute inset-x-0 bottom-4 px-4 flex justify-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar/Navbar";
-import Footer from "@/components/Footer/Footer";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Pentabrood",
-  description: "Your premium shopping destination",
-};
+import connectToDatabase from "@/lib/db";
+import SiteSettings from "@/models/SiteSettings";
+
+export async function generateMetadata() {
+  await connectToDatabase();
+  const settings = await SiteSettings.findOne();
+  const siteName = settings?.mainSettings?.siteName || "Said Store";
+
+  return {
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description: settings?.homepage?.hero?.subtitle || "Your premium shopping destination",
+  };
+}
 
 
 
@@ -33,14 +44,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pt-24`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <Navbar />
-              {children}
-              <Footer />
+              <ConditionalLayout>{children}</ConditionalLayout>
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

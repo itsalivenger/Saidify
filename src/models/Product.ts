@@ -53,6 +53,21 @@ const ProductSchema = new mongoose.Schema({
     featured: {
         type: Boolean,
         default: false
+    },
+    // Integration with Custom Designer
+    isBlank: {
+        type: Boolean,
+        default: false
+    },
+    designOrderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DesignOrder',
+        required: false
+    },
+    blankProductId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'BlankProduct',
+        required: false
     }
 }, { timestamps: true });
 

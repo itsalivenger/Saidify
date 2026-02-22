@@ -3,8 +3,30 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Hero() {
+    const [data, setData] = useState({
+        badge: "New Collection 2024",
+        title: "Elevate Your Style with Premium Essentials",
+        subtitle: "Discover the latest trends in fashion. High-quality materials, sustainable production, and timeless designs crafted just for you.",
+        image: "",
+        ctaPrimary: "Shop Now",
+        ctaSecondary: "Explore Collection",
+    });
+
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(r => r.json())
+            .then(settings => {
+                if (settings?.homepage?.hero) {
+                    setData(prev => ({ ...prev, ...settings.homepage.hero }));
+                }
+            })
+            .catch(() => {/* use defaults */ });
+    }, []);
+
     return (
         <section className="relative w-full overflow-hidden bg-neutral-50 dark:bg-neutral-900">
             <div className="container mx-auto px-4 md:px-6">
@@ -24,7 +46,7 @@ export default function Hero() {
                                 transition={{ delay: 0.2, duration: 0.5 }}
                                 className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                             >
-                                New Collection 2024
+                                {data.badge}
                             </motion.div>
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
@@ -32,7 +54,13 @@ export default function Hero() {
                                 transition={{ delay: 0.3, duration: 0.5 }}
                                 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-7xl/none text-neutral-900 dark:text-white"
                             >
-                                Elevate Your Style with <span className="text-blue-600 dark:text-blue-400">Premium</span> Essentials
+                                {data.title.includes('Premium') ? (
+                                    <>
+                                        {data.title.split('Premium')[0]}
+                                        <span className="text-blue-600 dark:text-blue-400">Premium</span>
+                                        {data.title.split('Premium')[1]}
+                                    </>
+                                ) : data.title}
                             </motion.h1>
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
@@ -40,7 +68,7 @@ export default function Hero() {
                                 transition={{ delay: 0.4, duration: 0.5 }}
                                 className="max-w-[600px] text-neutral-500 md:text-xl dark:text-neutral-400"
                             >
-                                Discover the latest trends in fashion. High-quality materials, sustainable production, and timeless designs crafted just for you.
+                                {data.subtitle}
                             </motion.p>
                         </div>
                         <motion.div
@@ -49,25 +77,21 @@ export default function Hero() {
                             transition={{ delay: 0.5, duration: 0.5 }}
                             className="flex flex-col gap-2 min-[400px]:flex-row"
                         >
-                            <button
-                                className={cn(
-                                    "inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50",
-                                    "group relative overflow-hidden"
-                                )}
-                            >
+                            <Link href="/shop" className={cn(
+                                "inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-8 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50",
+                                "group relative overflow-hidden"
+                            )}>
                                 <span className="relative z-10 flex items-center gap-2">
-                                    Shop Now <ShoppingBag className="h-4 w-4" />
+                                    {data.ctaPrimary} <ShoppingBag className="h-4 w-4" />
                                 </span>
-                            </button>
-                            <button
-                                className={cn(
-                                    "inline-flex h-12 items-center justify-center rounded-lg border border-neutral-200 bg-white px-8 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-300"
-                                )}
-                            >
+                            </Link>
+                            <Link href="/shop" className={cn(
+                                "inline-flex h-12 items-center justify-center rounded-lg border border-neutral-200 bg-white px-8 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-300"
+                            )}>
                                 <span className="flex items-center gap-2">
-                                    Explore Collection <ArrowRight className="h-4 w-4" />
+                                    {data.ctaSecondary} <ArrowRight className="h-4 w-4" />
                                 </span>
-                            </button>
+                            </Link>
                         </motion.div>
                     </motion.div>
 
@@ -79,12 +103,15 @@ export default function Hero() {
                         className="flex items-center justify-center lg:justify-end"
                     >
                         <div className="relative aspect-square w-full max-w-[550px] lg:aspect-[4/3] overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800 shadow-2xl">
-                            {/* Placeholder for Hero Image - prompting user later to generate one or I will use a placeholder tool if available, or just a colored box for now with text */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-neutral-800 dark:to-neutral-900">
-                                <span className="text-neutral-300 text-6xl font-bold opacity-20 transform -rotate-12 select-none">
-                                    HERO IMAGE
-                                </span>
-                            </div>
+                            {data.image ? (
+                                <img src={data.image} alt="Hero" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-neutral-800 dark:to-neutral-900">
+                                    <span className="text-neutral-300 text-6xl font-bold opacity-20 transform -rotate-12 select-none">
+                                        HERO IMAGE
+                                    </span>
+                                </div>
+                            )}
 
                             {/* Decorative elements */}
                             <motion.div

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Truck, ShieldCheck, ArrowRight, Minus, Plus } from "lucide-react";
+import { Star, Truck, ShieldCheck, ArrowRight, Minus, Plus, Wand2 } from "lucide-react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ interface ProductInfoProps {
         rating: number;
         sizes?: string[];
         colors?: { name: string, value: string }[];
+        isBlank?: boolean;
     };
     description?: string;
 }
@@ -118,34 +120,47 @@ export default function ProductInfo({ product, description }: ProductInfoProps) 
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <div className="flex items-center border-2 border-neutral-200 dark:border-neutral-800 rounded-2xl w-fit bg-white/5">
-                    <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-12 h-14 flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-l-2xl transition-colors"
+                {!product.isBlank && (
+                    <div className="flex items-center border-2 border-neutral-200 dark:border-neutral-800 rounded-2xl w-fit bg-white/5">
+                        <button
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            className="w-12 h-14 flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-l-2xl transition-colors"
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                        <button
+                            onClick={() => setQuantity(quantity + 1)}
+                            className="w-12 h-14 flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-r-2xl transition-colors"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
+
+                {product.isBlank ? (
+                    <Link
+                        href={`/design/${product.id}`}
+                        className="flex-1 h-14 rounded-2xl font-black text-lg transition-all active:scale-[0.98] shadow-xl uppercase tracking-widest bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/25 hover:shadow-purple-500/40 flex items-center justify-center gap-2"
                     >
-                        <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                        <Wand2 className="w-5 h-5" />
+                        Design Now
+                    </Link>
+                ) : (
                     <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="w-12 h-14 flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-r-2xl transition-colors"
+                        onClick={handleAddToCart}
+                        disabled={isAdded}
+                        style={{ cursor: 'pointer' }}
+                        className={cn(
+                            "flex-1 h-14 rounded-2xl font-black text-lg transition-all active:scale-[0.98] shadow-xl uppercase tracking-widest",
+                            isAdded
+                                ? "bg-green-600 text-white shadow-green-600/25"
+                                : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/25 hover:shadow-purple-500/40"
+                        )}
                     >
-                        <Plus className="w-4 h-4" />
+                        {isAdded ? "Added!" : `Add to Cart`}
                     </button>
-                </div>
-                <button
-                    onClick={handleAddToCart}
-                    disabled={isAdded}
-                    style={{ cursor: 'pointer' }}
-                    className={cn(
-                        "flex-1 h-14 rounded-2xl font-black text-lg transition-all active:scale-[0.98] shadow-xl uppercase tracking-widest",
-                        isAdded
-                            ? "bg-green-600 text-white shadow-green-600/25"
-                            : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/25 hover:shadow-purple-500/40"
-                    )}
-                >
-                    {isAdded ? "Added!" : `Add to Cart`}
-                </button>
+                )}
             </div>
 
             {/* Features */}

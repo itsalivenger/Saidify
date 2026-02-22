@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema(
                 quantity: { type: Number, default: 1 },
                 selectedSize: { type: String },
                 selectedColor: { type: String },
+                designOrderId: { type: mongoose.Schema.Types.ObjectId, ref: "DesignOrder" },
             },
         ],
         wishlist: [

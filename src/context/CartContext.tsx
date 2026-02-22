@@ -10,6 +10,7 @@ export interface CartItem {
     quantity: number;
     selectedSize?: string;
     selectedColor?: string;
+    designOrderId?: string;
 }
 
 interface CartContextType {
@@ -44,7 +45,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
                         image: item.image,
                         quantity: item.quantity,
                         selectedSize: item.selectedSize,
-                        selectedColor: item.selectedColor
+                        selectedColor: item.selectedColor,
+                        designOrderId: item.designOrderId
                     }));
                     setItems(backendItems);
                     setIsAuthenticated(true);
@@ -97,7 +99,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             const existingItemIndex = currentItems.findIndex(
                 (item) => String(item.id) === String(newItem.id) &&
                     item.selectedSize === newItem.selectedSize &&
-                    item.selectedColor === newItem.selectedColor
+                    item.selectedColor === newItem.selectedColor &&
+                    item.designOrderId === newItem.designOrderId
             );
 
             if (existingItemIndex > -1) {
@@ -123,7 +126,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
                             image: newItem.image,
                             quantity: newItem.quantity,
                             selectedSize: newItem.selectedSize,
-                            selectedColor: newItem.selectedColor
+                            selectedColor: newItem.selectedColor,
+                            designOrderId: newItem.designOrderId
                         }
                     }),
                 });
@@ -183,7 +187,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             image: item.image,
             quantity: item.quantity,
             selectedSize: item.selectedSize,
-            selectedColor: item.selectedColor
+            selectedColor: item.selectedColor,
+            designOrderId: item.designOrderId
         }));
 
         await fetch("/api/cart", {

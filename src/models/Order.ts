@@ -16,6 +16,7 @@ const OrderSchema = new mongoose.Schema(
                 quantity: { type: Number, required: true },
                 selectedSize: { type: String },
                 selectedColor: { type: String },
+                designOrderId: { type: mongoose.Schema.Types.ObjectId, ref: "DesignOrder" },
             },
         ],
         totalAmount: {

@@ -23,6 +23,23 @@ export default function Navbar() {
     const { totalItems } = useCart();
     const { items: wishlistItems } = useWishlist();
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const [settings, setSettings] = useState<any>(null);
+
+    // Fetch Site Settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings(data);
+                }
+            } catch (err) {
+                console.error('Error fetching settings', err);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // Fetch suggestions
     useEffect(() => {
@@ -77,6 +94,7 @@ export default function Navbar() {
         { name: "Home", href: "/" },
         { name: "Collections", href: "/categories" },
         { name: "Boutique", href: "/shop" },
+        { name: "Studio", href: "/design" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
     ];
@@ -98,12 +116,18 @@ export default function Navbar() {
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2 group relative z-10">
-                            <div className="bg-black dark:bg-white text-white dark:text-black p-2 rounded-xl group-hover:rotate-6 transition-transform">
-                                <ShoppingBag className="w-5 h-5" />
-                            </div>
-                            <span className="text-2xl font-black tracking-tighter uppercase transition-colors">
-                                Pentabrood
-                            </span>
+                            {settings?.mainSettings?.logo ? (
+                                <img src={settings.mainSettings.logo} alt={settings.mainSettings.siteName} className="h-8 md:h-10 w-auto object-contain" />
+                            ) : (
+                                <>
+                                    <div className="bg-black dark:bg-white text-white dark:text-black p-2 rounded-xl group-hover:rotate-6 transition-transform">
+                                        <ShoppingBag className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-2xl font-black tracking-tighter uppercase transition-colors">
+                                        {settings?.mainSettings?.siteName || "Said Store"}
+                                    </span>
+                                </>
+                            )}
                         </Link>
 
                         {/* Desktop Navigation */}
@@ -204,7 +228,7 @@ export default function Navbar() {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             exit={{ scale: 0 }}
-                                            className="absolute top-0 right-0 w-4 h-4 bg-primary text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background"
+                                            className="absolute top-0 right-0 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background"
                                         >
                                             {wishlistItems.length}
                                         </motion.span>
@@ -231,7 +255,7 @@ export default function Navbar() {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             exit={{ scale: 0 }}
-                                            className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background"
+                                            className="absolute top-0 right-0 w-4 h-4 bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background"
                                         >
                                             {totalItems}
                                         </motion.span>

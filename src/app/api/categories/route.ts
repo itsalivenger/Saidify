@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/db';
 import Category from '@/models/Category';
+import { isAdmin } from '@/lib/auth';
 
 export async function GET() {
     try {
@@ -15,8 +16,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
         await connectToDatabase();
-        const { name, active, description } = await req.json();
+        const { name, active, description, image } = await req.json();
 
         const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
@@ -24,7 +28,8 @@ export async function POST(req: Request) {
             name,
             slug,
             active,
-            description
+            description,
+            image
         });
 
         await category.save();
@@ -37,14 +42,17 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
     try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
         await connectToDatabase();
-        const { id, name, active, description } = await req.json();
+        const { id, name, active, description, image } = await req.json();
 
         const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
         const category = await Category.findByIdAndUpdate(
             id,
-            { name, slug, active, description },
+            { name, slug, active, description, image },
             { new: true }
         );
 
@@ -57,6 +65,9 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
         await connectToDatabase();
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');

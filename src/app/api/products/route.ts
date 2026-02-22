@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/db';
 import Product from '@/models/Product';
-// import { getServerSession } from 'next-auth'; // Use this if you have next-auth setup
+import BlankProduct from '@/models/BlankProduct';
+import { isAdmin } from '@/lib/auth';
 
 export async function GET(req: Request) {
     try {
@@ -53,10 +54,37 @@ export async function GET(req: Request) {
             .skip(skip)
             .limit(limit);
 
-        const total = await Product.countDocuments(query);
+        const totalProducts = await Product.countDocuments(query);
+
+        // Fetch blanks if applicable (no deep filtering by size/color for blanks yet)
+        let blanks: any[] = [];
+        let totalBlanks = 0;
+
+        // Only fetch blanks if we're on page 1 and no specific product-only filter is active
+        // Or if searching/category filtering
+        if (page === 1 && !size && !color) {
+            const blankQuery: any = { active: true };
+            if (category && category !== 'All') blankQuery.category = query.category;
+            if (search) blankQuery.name = { $regex: search, $options: 'i' };
+
+            const blankResults = await BlankProduct.find(blankQuery).limit(5); // Show up to 5 templates
+            totalBlanks = await BlankProduct.countDocuments(blankQuery);
+
+            blanks = blankResults.map(b => ({
+                _id: b._id,
+                title: b.name,
+                price: b.basePrice,
+                category: "Customizable", // Force category or use b.category.name if populated
+                image: b.views?.[0]?.mockupImage || "",
+                rating: 0,
+                isBlank: true
+            }));
+        }
+
+        const total = totalProducts + totalBlanks;
 
         return NextResponse.json({
-            products,
+            products: [...blanks, ...products], // Prepend blanks
             total,
             page,
             totalPages: Math.ceil(total / limit)
@@ -69,8 +97,10 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
+        if (!(await isAdmin())) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
         await connectToDatabase();
-        // In a real app, verify admin session/token here
         const body = await req.json();
 
         const product = new Product(body);

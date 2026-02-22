@@ -1,22 +1,7 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import connectToDatabase from "@/lib/db";
 import User from "@/models/User";
-
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this";
-
-async function isAdmin() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    if (!token) return false;
-    try {
-        const decoded: any = jwt.verify(token, JWT_SECRET);
-        return decoded.role === "admin";
-    } catch (error) {
-        return false;
-    }
-}
+import { isAdmin } from "@/lib/auth";
 
 export async function GET(
     request: Request,
