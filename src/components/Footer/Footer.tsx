@@ -1,9 +1,27 @@
 import { useState, useEffect } from "react";
-import { Facebook, Instagram, Twitter, Youtube, CreditCard, Mail, MapPin, Phone, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Twitter, CreditCard, Linkedin } from "lucide-react";
 import Link from "next/link";
 
+interface SiteSettings {
+    mainSettings?: {
+        logo?: string;
+        siteName?: string;
+        socialLinks?: {
+            instagram?: string;
+            twitter?: string;
+            facebook?: string;
+            linkedin?: string;
+        };
+    };
+    homepage?: {
+        hero?: {
+            subtitle?: string;
+        };
+    };
+}
+
 export default function Footer() {
-    const [settings, setSettings] = useState<any>(null);
+    const [settings, setSettings] = useState<SiteSettings | null>(null);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -24,7 +42,7 @@ export default function Footer() {
     const socials = info.socialLinks || {};
 
     // Helper to check if a link is valid (not empty and not just whitespace)
-    const isValidLink = (link: any) => typeof link === 'string' && link.trim() !== '';
+    const isValidLink = (link?: string) => typeof link === 'string' && link.trim() !== '';
 
     return (
         <footer className="bg-neutral-900 text-neutral-300 py-16">

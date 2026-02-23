@@ -61,7 +61,7 @@ export default function DesignStudioPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                         className="text-lg text-neutral-300 max-w-xl mx-auto mb-10"
                     >
-                        Choose a blank product, upload your design, place it exactly where you want it — and we'll bring it to life.
+                        Choose a blank product, upload your design, place it exactly where you want it — and we&apos;ll bring it to life.
                     </motion.p>
 
                     {/* Search */}

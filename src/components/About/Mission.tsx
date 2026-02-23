@@ -37,7 +37,7 @@ export default function Mission({ data }: MissionProps) {
                     viewport={{ once: true }}
                     className="block text-sm md:text-base font-bold uppercase tracking-[0.2em] mb-4 text-white/80"
                 >
-                    Our Mission
+                    {badge}
                 </motion.span>
 
                 <motion.h1
@@ -47,7 +47,7 @@ export default function Mission({ data }: MissionProps) {
                     transition={{ delay: 0.1 }}
                     className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight mb-8"
                 >
-                    Redefining modern<br />luxury for everyone.
+                    {title}
                 </motion.h1>
 
                 <motion.p
@@ -57,8 +57,7 @@ export default function Mission({ data }: MissionProps) {
                     transition={{ delay: 0.2 }}
                     className="text-lg md:text-2xl text-white/80 font-light leading-relaxed"
                 >
-                    We believe that style shouldn't come at the cost of sustainability or accessibility.
-                    Our goal is to create timeless pieces that empower you to express your unique self.
+                    {description}
                 </motion.p>
             </div>
         </section>

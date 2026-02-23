@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight, Loader2, X, LogIn, UserPlus, Phone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -64,7 +64,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'l
                 const data = await res.json();
                 setError(data.message || 'Authentication failed');
             }
-        } catch (err) {
+        } catch {
             setError('Something went wrong. Please try again.');
         } finally {
             setLoading(false);

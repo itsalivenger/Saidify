@@ -13,7 +13,7 @@ interface ProductItem {
 }
 
 interface ShopGridProps {
-    onQuickView: (product: any) => void;
+    onQuickView: (product: ProductItem) => void;
     products: ProductItem[];
     viewMode?: 'grid' | 'list';
 }

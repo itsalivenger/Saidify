@@ -5,10 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowLeft, Upload, Type, Trash2, Loader2, ShoppingCart,
-    ChevronLeft, ChevronRight, FlipHorizontal, FlipVertical,
+    FlipHorizontal, FlipVertical,
     RotateCcw, RotateCw, Minus, Plus, Layers, Save,
-    Check, ImageIcon, AlignCenter, Bold, Italic, Globe,
-    Undo, Redo, Wand2
+    Check, ImageIcon, Bold, Italic, Globe,
+    Undo, Redo
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -67,7 +67,7 @@ export default function DesignStudioEditor() {
 
     // Tool panel state
     const [activePanel, setActivePanel] = useState<'layers' | 'text' | 'upload'>('layers');
-    const [layers, setLayers] = useState<any[]>([]);
+    const [layers, setLayers] = useState<{ id: string; type: string; text?: string; visible: boolean }[]>([]);
     const [selectedObjId, setSelectedObjId] = useState<string | null>(null);
 
     // Text tool state
@@ -105,8 +105,8 @@ export default function DesignStudioEditor() {
     const updateLayers = useCallback(() => {
         if (!fabricRef.current) return;
         const objs = fabricRef.current.getObjects()
-            .filter((o: any) => o.selectable)
-            .map((o: any) => ({
+            .filter((o: { selectable: boolean }) => o.selectable)
+            .map((o: { id: string; type: string; text?: string; visible: boolean }) => ({
                 id: o.id,
                 type: o.type,
                 text: o.text,
@@ -118,7 +118,7 @@ export default function DesignStudioEditor() {
     // Save to history helper
     const saveToHistory = useCallback(() => {
         if (!fabricRef.current || isHistoryChange.current) return;
-        const json = JSON.stringify((fabricRef.current as any).toJSON(['id', 'selectable']));
+        const json = JSON.stringify(fabricRef.current.toJSON(['id', 'selectable']));
         setHistory(prev => {
             const last = prev[prev.length - 1];
             if (last === json) return prev; // Avoid duplicates
@@ -246,7 +246,7 @@ export default function DesignStudioEditor() {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [textInput, textFont, textSize, textColor, textBold, textItalic, saveToHistory]);
+    }, [textInput, textFont, textSize, textColor, textBold, textItalic, saveToHistory, updateLayers]);
 
     // Setup Fabric canvas
     useEffect(() => {
@@ -321,7 +321,7 @@ export default function DesignStudioEditor() {
                         // Fabric.js v6: loadFromJSON returns a Promise, no callback param
                         await canvas.loadFromJSON(state);
                         // After load: ensure user-placed objects are selectable
-                        canvas.getObjects().forEach((obj: any) => {
+                        canvas.getObjects().forEach((obj: { selectable?: boolean, evented?: boolean, id?: string, type?: string, set: (props: any) => void }) => {
                             // Only fix objects that should be selectable (not mockup/zone)
                             if (obj.selectable !== false) {
                                 obj.set({ selectable: true, evented: true });
@@ -431,7 +431,7 @@ export default function DesignStudioEditor() {
                 fabricRef.current = null;
             }
         };
-    }, [product, selectedViewIdx, selectedZoneId, savedFabricState, updateLayers]);
+    }, [product, selectedViewIdx, selectedZoneId, savedFabricState, updateLayers, saveToHistory]);
 
 
 
@@ -450,7 +450,7 @@ export default function DesignStudioEditor() {
             const zw = bounds?.zw || canvas.width! * 0.6;
             const zh = bounds?.zh || canvas.height! * 0.6;
 
-            let scale = Math.min(
+            const scale = Math.min(
                 (zw * 0.8) / img.width!,
                 (zh * 0.8) / img.height!,
                 1
@@ -469,6 +469,8 @@ export default function DesignStudioEditor() {
             canvas.add(img);
             canvas.setActiveObject(img);
             canvas.renderAll();
+            updateLayers();
+            saveToHistory();
         } catch (e) {
             console.error('Image upload error', e);
         } finally {

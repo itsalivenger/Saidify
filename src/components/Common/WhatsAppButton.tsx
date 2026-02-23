@@ -8,6 +8,22 @@ export default function WhatsAppButton() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isVisible, setIsVisible] = useState(false);
 
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch('/api/settings');
+            if (res.ok) {
+                const data = await res.json();
+                const phone = data.mainSettings?.contactPhone;
+                if (phone) {
+                    const cleanPhone = phone.replace(/\s+/g, '').replace(/[()]/g, '');
+                    setPhoneNumber(prev => prev === cleanPhone ? prev : cleanPhone);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching WhatsApp settings:', error);
+        }
+    };
+
     useEffect(() => {
         fetchSettings();
 
@@ -22,25 +38,6 @@ export default function WhatsAppButton() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                // Assumes settings.mainSettings.contactPhone is the correct field
-                // Based on previous research in WebsiteControlPage
-                const phone = data.mainSettings?.contactPhone;
-                if (phone) {
-                    // Clean phone number (remove spaces, etc. for WhatsApp link)
-                    const cleanPhone = phone.replace(/\s+/g, '').replace(/[()]/g, '');
-                    setPhoneNumber(cleanPhone);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching WhatsApp settings:', error);
-        }
-    };
 
     if (!phoneNumber) return null;
 

@@ -24,26 +24,26 @@ const FILTER_SECTIONS = [
 ];
 
 interface ShopFiltersProps {
-    activeCategory: string;
+    categories: string[];
+    selectedCategory: string;
     onCategoryChange: (category: string) => void;
-    dbCategories?: string[];
     priceRange: [number, number];
     onPriceChange: (range: [number, number]) => void;
-    activeSize: string;
-    onSizeChange: (size: string) => void;
-    activeColor: string;
-    onColorChange: (color: string) => void;
+    selectedSize: string | null;
+    onSizeChange: (size: string | null) => void;
+    selectedColor: string | null;
+    onColorChange: (color: string | null) => void;
 }
 
 export default function ShopFilters({
-    activeCategory,
+    categories = [],
+    selectedCategory,
     onCategoryChange,
-    dbCategories = [],
     priceRange,
     onPriceChange,
-    activeSize,
+    selectedSize,
     onSizeChange,
-    activeColor,
+    selectedColor,
     onColorChange
 }: ShopFiltersProps) {
     const [openSections, setOpenSections] = useState<string[]>(["category", "price", "size", "color"]);
@@ -55,7 +55,7 @@ export default function ShopFilters({
         {
             id: "category",
             title: "Category",
-            options: ["All Products", ...dbCategories]
+            options: ["All Products", ...categories]
         },
         {
             id: "size",
@@ -194,18 +194,14 @@ export default function ShopFilters({
                                                     type="radio"
                                                     name={section.id}
                                                     checked={
-                                                        section.id === "category"
-                                                            ? (activeCategory === "All" && option === "All Products") || activeCategory === option
-                                                            : section.id === "size"
-                                                                ? activeSize === option
-                                                                : section.id === "color"
-                                                                    ? activeColor === option
-                                                                    : false
+                                                        (section.id === "category" && ((selectedCategory === "All" && option === "All Products") || selectedCategory === option)) ||
+                                                        (section.id === "size" && selectedSize === option) ||
+                                                        (section.id === "color" && selectedColor === option)
                                                     }
                                                     onChange={() => {
                                                         if (section.id === "category") handleCategoryClick(option);
-                                                        if (section.id === "size") onSizeChange(option);
-                                                        if (section.id === "color") onColorChange(option);
+                                                        if (section.id === "size") onSizeChange(option === "All" ? null : option);
+                                                        if (section.id === "color") onColorChange(option === "All" ? null : option);
                                                     }}
                                                     className="peer w-4 h-4 border-2 border-neutral-300 rounded-full text-primary focus:ring-primary/20 dark:border-neutral-600 dark:bg-neutral-800"
                                                 />
@@ -213,9 +209,11 @@ export default function ShopFilters({
                                             <span className={cn(
                                                 "text-sm transition-colors",
                                                 (
-                                                    (activeCategory === (option === "All Products" ? "All" : option) && section.id === "category") ||
-                                                    (activeSize === option && section.id === "size") ||
-                                                    (activeColor === option && section.id === "color")
+                                                    (selectedCategory === (option === "All Products" ? "All" : option) && section.id === "category") ||
+                                                    (selectedSize === option && section.id === "size") ||
+                                                    (selectedColor === option && section.id === "color") ||
+                                                    (selectedSize === null && option === "All" && section.id === "size") ||
+                                                    (selectedColor === null && option === "All" && section.id === "color")
                                                 )
                                                     ? "text-primary font-bold"
                                                     : "text-neutral-600 dark:text-neutral-400 group-hover/label:text-foreground"

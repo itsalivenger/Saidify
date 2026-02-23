@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 import { useAuth } from "@/context/AuthContext";
 
-export default function LoginPage() {
+function LoginContent() {
     const { login, isAuthenticated, loading: authLoading } = useAuth();
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -44,7 +44,7 @@ export default function LoginPage() {
                 const data = await res.json();
                 setError(data.message || "Login failed");
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong. Please try again.");
         } finally {
             setLoading(false);
@@ -150,12 +150,24 @@ export default function LoginPage() {
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground mt-6">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link href="/signup" className="font-bold text-foreground hover:text-primary transition-colors">
                         Sign up
                     </Link>
                 </p>
             </form>
         </AuthLayout>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }

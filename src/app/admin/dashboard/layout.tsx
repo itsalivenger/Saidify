@@ -8,18 +8,20 @@ import {
     ShoppingCart,
     Globe,
     LogOut,
-    ChevronRight,
     ChevronDown,
     Menu,
-    X,
     Settings,
-    User as UserIcon,
-    ChevronLeft,
     Users,
     Palette,
     Package
 } from 'lucide-react';
 import Link from 'next/link';
+
+interface AdminUser {
+    name: string;
+    email: string;
+    role?: string;
+}
 
 export default function AdminDashboardLayout({
     children,
@@ -34,15 +36,24 @@ export default function AdminDashboardLayout({
     const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.includes('/settings'));
     const [isDesignerOpen, setIsDesignerOpen] = useState(pathname.includes('/blanks'));
     const [isWebsiteOpen, setIsWebsiteOpen] = useState(pathname.includes('/website') || pathname.includes('/about'));
-    const [adminUser, setAdminUser] = useState<any>(null);
+    const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
+        if (typeof window !== 'undefined') {
+            const user = localStorage.getItem('adminUser');
+            if (user) {
+                try {
+                    return JSON.parse(user);
+                } catch {
+                    return null;
+                }
+            }
+        }
+        return null;
+    });
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
-        const user = localStorage.getItem('adminUser');
         if (!token) {
             router.push('/admin/login');
-        } else if (user) {
-            setAdminUser(JSON.parse(user));
         }
     }, [router]);
 

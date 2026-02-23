@@ -78,15 +78,8 @@ function ZoneEditor({
     const [editingLabel, setEditingLabel] = useState<string | null>(null);
     const [newLabel, setNewLabel] = useState('');
 
-    // Sync zones up
-    useEffect(() => {
-        onZoneChange(zones);
-    }, [zones]);
-
-    // Sync incoming zones
-    useEffect(() => {
-        setZones(view.printZones || []);
-    }, [view.name]);
+    // We don't need the useEffect to sync up anymore, we'll call onZoneChange directly
+    // in the update functions below to avoid cascading renders.
 
     const getRelativeCoords = (e: React.MouseEvent) => {
         const rect = containerRef.current!.getBoundingClientRect();
@@ -137,12 +130,15 @@ function ZoneEditor({
         };
         const updated = [...zones, zone];
         setZones(updated);
+        onZoneChange(updated);
         setSelectedZoneId(id);
         setActiveDraw(null);
     };
 
     const deleteZone = (id: string) => {
-        setZones(prev => prev.filter(z => z.id !== id));
+        const updated = zones.filter(z => z.id !== id);
+        setZones(updated);
+        onZoneChange(updated);
         if (selectedZoneId === id) setSelectedZoneId(null);
     };
 
@@ -153,12 +149,16 @@ function ZoneEditor({
 
     const saveLabel = () => {
         if (!editingLabel) return;
-        setZones(prev => prev.map(z => z.id === editingLabel ? { ...z, label: newLabel } : z));
+        const updated = zones.map(z => z.id === editingLabel ? { ...z, label: newLabel } : z);
+        setZones(updated);
+        onZoneChange(updated);
         setEditingLabel(null);
     };
 
     const updateZoneField = (id: string, key: keyof PrintZone, value: any) => {
-        setZones(prev => prev.map(z => z.id === id ? { ...z, [key]: value } : z));
+        const updated = zones.map(z => z.id === id ? { ...z, [key]: value } : z);
+        setZones(updated);
+        onZoneChange(updated);
     };
 
     const selectedZone = zones.find(z => z.id === selectedZoneId);
@@ -835,6 +835,7 @@ export default function BlankProductFormPage() {
                                     </div>
 
                                     <ZoneEditor
+                                        key={`${activeViewIdx}-${form.views[activeViewIdx].name}`}
                                         view={form.views[activeViewIdx]}
                                         onZoneChange={(zones) => updateViewZones(activeViewIdx, zones)}
                                     />
@@ -917,7 +918,7 @@ export default function BlankProductFormPage() {
                                 <div className="w-12 h-12 rounded-2xl bg-purple-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-purple-500/20">2</div>
                                 <h3 className="font-black text-lg">Upload Mockups</h3>
                                 <p className="text-sm text-neutral-500 leading-relaxed">
-                                    In Step 2, add "Views" like Front or Back. Upload a high-quality mockup image for each view. This is what customers will see when designing.
+                                    In Step 2, add &quot;Views&quot; like Front or Back. Upload a high-quality mockup image for each view. This is what customers will see when designing.
                                 </p>
                             </div>
 
@@ -925,7 +926,7 @@ export default function BlankProductFormPage() {
                                 <div className="w-12 h-12 rounded-2xl bg-purple-500 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-purple-500/20">3</div>
                                 <h3 className="font-black text-lg">Draw Zones</h3>
                                 <p className="text-sm text-neutral-500 leading-relaxed">
-                                    <strong>Click and drag</strong> directly on your mockup image to draw "Print Zones". These zones define exactly where a customer can place their artwork.
+                                    <strong>Click and drag</strong> directly on your mockup image to draw &quot;Print Zones&quot;. These zones define exactly where a customer can place their artwork.
                                 </p>
                             </div>
                         </div>
@@ -946,7 +947,7 @@ export default function BlankProductFormPage() {
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                    The "Locked" feature prevents customers from moving their design outside the rectangle you drew.
+                                    The &quot;Locked&quot; feature prevents customers from moving their design outside the rectangle you drew.
                                 </li>
                             </ul>
                         </div>
@@ -956,7 +957,7 @@ export default function BlankProductFormPage() {
                                 onClick={() => setActiveTab(0)}
                                 className="px-10 py-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-2xl font-bold shadow-xl shadow-neutral-500/10 hover:scale-[1.03] transition-transform"
                             >
-                                Got it, let's build!
+                                Got it, let&apos;s build!
                             </button>
                         </div>
                     </motion.div>

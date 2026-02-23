@@ -1,23 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Heart, ShoppingBag, Eye, Star, Wand2 } from "lucide-react";
+import { Heart, ShoppingBag, Eye, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
 
+interface Product {
+    id: string | number;
+    title: string;
+    price: string;
+    image: string;
+    category: string;
+    rating: number;
+    isBlank?: boolean;
+    description?: string;
+}
+
 interface ProductCardProps {
-    product: {
-        id: string | number;
-        title: string;
-        price: string;
-        image: string;
-        category: string;
-        rating: number;
-        isBlank?: boolean;
-        description?: string;
-    };
-    onQuickView?: (product: any) => void;
+    product: Product;
+    onQuickView?: (product: Product) => void;
     viewMode?: 'grid' | 'list';
 }
 

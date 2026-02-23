@@ -1,0 +1,238 @@
+﻿
+> site_said@0.1.0 build
+> next build
+
+node.exe : [baseline-
+browser-mapping] The 
+data in this module 
+is over two months 
+old.  To ensure 
+accurate Baseline 
+data, please update: 
+`npm i baseline-brows
+er-mapping@latest -D`
+Au caractère Ligne:1 
+: 1
++ & "C:\Program Files
+\nodejs/node.exe" "C:
+\Users\aliho\AppData\
+Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([baseli   
+ ne-brows...ping@    
+latest -D`:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+   Ôû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+ Ô£ô Compiled successfully in 24.1s
+   Running TypeScript ...
+   Collecting page data using 7 workers ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+   Generating static pages using 7 workers (0/58) ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+   Generating static pages using 7 workers (14/58) 
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+ Ô¿» 
+useSearchParams() 
+should be wrapped in 
+a suspense boundary 
+at page "/login". 
+Read more: https://ne
+xtjs.org/docs/message
+s/missing-suspense-wi
+th-csr-bailout
+    at S (C:\Users\al
+iho\Desktop\projects\
+site_said\site_said\.
+next\server\chunks\ss
+r\node_modules_next_c
+f02c53c._.js:2:2111)
+    at p (C:\Users\al
+iho\Desktop\projects\
+site_said\site_said\.
+next\server\chunks\ss
+r\node_modules_next_c
+f02c53c._.js:4:4847)
+    at j (C:\Users\al
+iho\Desktop\projects\
+site_said\site_said\.
+next\server\chunks\ss
+r\_b0ff416a._.js:1:33
+85)
+    at ar (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:84366)
+    at aa (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:86185)
+    at as (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:107952)
+    at ao (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:105374)
+    at an (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:84718)
+    at aa (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:86234)
+    at aa (C:\Users\a
+liho\Desktop\projects
+\site_said\site_said\
+node_modules\next\dis
+t\compiled\next-serve
+r\app-page-turbo.runt
+ime.prod.js:2:104714)
+Error occurred 
+prerendering page 
+"/login". Read more: 
+https://nextjs.org/do
+cs/messages/prerender
+-error
+Export encountered 
+an error on 
+/login/page: /login, 
+exiting the build.
+ Ô¿» Next.js build 
+worker exited with 
+code: 1 and signal: 
+null

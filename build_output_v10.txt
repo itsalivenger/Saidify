@@ -1,0 +1,223 @@
+﻿
+> site_said@0.1.0 build
+> next build
+
+node.exe : [baseline-
+browser-mapping] The 
+data in this module 
+is over two months 
+old.  To ensure 
+accurate Baseline 
+data, please update: 
+`npm i baseline-brows
+er-mapping@latest -D`
+Au caractère Ligne:1 
+: 1
++ & "C:\Program Files
+\nodejs/node.exe" "C:
+\Users\aliho\AppData\
+Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([baseli   
+ ne-brows...ping@    
+latest -D`:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+   Ôû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+ Ô£ô Compiled successfully in 25.9s
+   Running TypeScript ...
+   Collecting page data using 7 workers ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+   Generating static pages using 7 workers (0/58) ...
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+[baseline-browser-map
+ping] The data in 
+this module is over 
+two months old.  To 
+ensure accurate 
+Baseline data, 
+please update: `npm 
+i baseline-browser-ma
+pping@latest -D`
+   Generating static pages using 7 workers (14/58) 
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+Connecting to MongoDB: clientsali.dfld8.mongodb.net/Pentabrood?retryWrites=true&w=majority&appName=ClientsAli DB: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+MongoDB Connected Successfully to: Pentabrood
+   Generating static pages using 7 workers (28/58) 
+   Generating static pages using 7 workers (43/58) 
+ Ô£ô Generating static pages using 7 workers (58/58) in 13.1s
+   Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ Ôùï /about
+Ôö£ Ôùï /admin/dashboard
+Ôö£ Ôùï /admin/dashboard/blanks
+Ôö£ ãÆ /admin/dashboard/blanks/[id]
+Ôö£ Ôùï /admin/dashboard/clients
+Ôö£ ãÆ /admin/dashboard/clients/[id]
+Ôö£ Ôùï /admin/dashboard/orders/custom
+Ôö£ Ôùï /admin/dashboard/orders/regular
+Ôö£ Ôùï /admin/dashboard/products/1
+Ôö£ Ôùï /admin/dashboard/products/categories
+Ôö£ Ôùï /admin/dashboard/products/master
+Ôö£ Ôùï /admin/dashboard/settings/about
+Ôö£ Ôùï /admin/dashboard/settings/website
+Ôö£ Ôùï /admin/login
+Ôö£ ãÆ /api/admin/dashboard/stats
+Ôö£ ãÆ /api/admin/login
+Ôö£ ãÆ /api/admin/logout
+Ôö£ ãÆ /api/admin/orders
+Ôö£ ãÆ /api/admin/seed
+Ôö£ ãÆ /api/admin/users
+Ôö£ ãÆ /api/admin/users/[id]
+Ôö£ ãÆ /api/auth/login
+Ôö£ ãÆ /api/auth/logout
+Ôö£ ãÆ /api/auth/me
+Ôö£ ãÆ /api/auth/signup
+Ôö£ ãÆ /api/blanks
+Ôö£ ãÆ /api/blanks/[id]
+Ôö£ ãÆ /api/cart
+Ôö£ ãÆ /api/categories
+Ôö£ ãÆ /api/contact
+Ôö£ ãÆ /api/design-orders
+Ôö£ ãÆ /api/design-orders/[id]
+Ôö£ ãÆ /api/design-orders/publish
+Ôö£ ãÆ /api/newsletter
+Ôö£ ãÆ /api/orders
+Ôö£ ãÆ /api/products
+Ôö£ ãÆ /api/products/[id]
+Ôö£ ãÆ /api/products/search
+Ôö£ ãÆ /api/settings
+Ôö£ ãÆ /api/upload
+Ôö£ ãÆ /api/wishlist
+Ôö£ Ôùï /cart
+Ôö£ Ôùï /categories
+Ôö£ Ôùï /checkout
+Ôö£ Ôùï /contact
+Ôö£ Ôùï /design
+Ôö£ ãÆ /design/[productId]
+Ôö£ Ôùï /login
+Ôö£ Ôùï /privacy
+Ôö£ Ôùï /profile
+Ôö£ Ôùï /profile/designs
+Ôö£ Ôùï /returns
+Ôö£ Ôùï /search
+Ôö£ Ôùï /shipping
+Ôö£ Ôùï /shop
+Ôö£ ãÆ /shop/[id]
+Ôö£ Ôùï /shop/login
+Ôö£ Ôùï /shop/profile
+Ôö£ Ôùï /shop/signup
+Ôö£ Ôùï /signup
+Ôö£ Ôùï /terms
+Ôöö Ôùï /wishlist
+
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

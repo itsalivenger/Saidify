@@ -1,16 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ShopGrid from "@/components/Shop/ShopGrid";
 import QuickViewModal from "@/components/Shop/QuickViewModal";
 
-export default function SearchPage() {
+interface Product {
+    _id: string;
+    title: string;
+    price: number;
+    category: string;
+    image: string;
+    rating: number;
+    description?: string;
+    stock?: number;
+}
+
+function SearchContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get("q");
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [quickViewProduct, setQuickViewProduct] = useState(null);
+    const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -19,7 +30,7 @@ export default function SearchPage() {
                 if (query) {
                     const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
                     const data = await res.json();
-                    setProducts(data.products);
+                    setProducts(data.products || []);
                 } else {
                     setProducts([]);
                 }
@@ -43,7 +54,21 @@ export default function SearchPage() {
                 {loading ? (
                     <div className="text-center py-20">Loading...</div>
                 ) : products.length > 0 ? (
-                    <ShopGrid products={products} onQuickView={setQuickViewProduct} />
+                    <ShopGrid
+                        products={products.map((p: any) => ({
+                            id: p._id,
+                            title: p.title,
+                            price: `${p.price.toFixed(2)} MAD`,
+                            category: p.category,
+                            rating: p.rating,
+                            image: p.image,
+                            description: p.description
+                        }))}
+                        onQuickView={(p: any) => {
+                            const found = products.find(prod => prod._id === p.id);
+                            if (found) setQuickViewProduct(found);
+                        }}
+                    />
                 ) : (
                     <div className="text-center py-20">
                         <p className="text-xl text-muted-foreground">No products found considering your search criteria.</p>
@@ -51,11 +76,28 @@ export default function SearchPage() {
                 )}
             </div>
 
-            <QuickViewModal
-                isOpen={!!quickViewProduct}
-                onClose={() => setQuickViewProduct(null)}
-                product={quickViewProduct}
-            />
+            {quickViewProduct && (
+                <QuickViewModal
+                    isOpen={!!quickViewProduct}
+                    onClose={() => setQuickViewProduct(null)}
+                    product={{
+                        id: quickViewProduct._id,
+                        title: quickViewProduct.title,
+                        category: quickViewProduct.category,
+                        image: quickViewProduct.image,
+                        rating: quickViewProduct.rating,
+                        price: `${quickViewProduct.price.toFixed(2)} MAD`
+                    }}
+                />
+            )}
         </main>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <SearchContent />
+        </Suspense>
     );
 }
