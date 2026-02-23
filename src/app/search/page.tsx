@@ -80,14 +80,7 @@ function SearchContent() {
                 <QuickViewModal
                     isOpen={!!quickViewProduct}
                     onClose={() => setQuickViewProduct(null)}
-                    product={{
-                        id: quickViewProduct._id,
-                        title: quickViewProduct.title,
-                        category: quickViewProduct.category,
-                        image: quickViewProduct.image,
-                        rating: quickViewProduct.rating,
-                        price: `${quickViewProduct.price.toFixed(2)} MAD`
-                    }}
+                    product={quickViewProduct as any}
                 />
             )}
         </main>
