@@ -29,7 +29,16 @@ import {
     TrendingUp,
     Search,
     Zap,
-    Package
+    Package,
+    ArrowUpRight,
+    Tag,
+    PackagePlus,
+    Clock,
+    Award,
+    Instagram,
+    Twitter,
+    Linkedin,
+    Facebook,
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -584,7 +593,7 @@ export default function WebsiteControlPage() {
                                         );
                                     })}
                                 </div>
-                                {categories.length === 0 && <p className="text-xs text-muted-foreground italic">No categories found. Add categories in Products > Categories.</p>}
+                                {categories.length === 0 && <p className="text-xs text-muted-foreground italic">No categories found. Add categories in Products {" > "} Categories.</p>}
                             </div>
                         </SectionCard>
 
