@@ -37,6 +37,11 @@ const SiteSettingsSchema = new mongoose.Schema({
                 { author: "Michael Ross", role: "Loyal Customer", content: "Customer service was incredibly helpful when I needed to exchange for a different size. The process was seamless.", rating: 4 },
             ]
         },
+        selectedCategories: {
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: 'Category',
+            default: []
+        },
     },
     mainSettings: {
         siteName: { type: String, default: "Said Store" },
@@ -44,6 +49,7 @@ const SiteSettingsSchema = new mongoose.Schema({
         contactEmail: { type: String, default: "" },
         contactPhone: { type: String, default: "" },
         address: { type: String, default: "" },
+        whatsappNumber: { type: String, default: "" },
         socialLinks: {
             facebook: { type: String, default: "" },
             instagram: { type: String, default: "" },

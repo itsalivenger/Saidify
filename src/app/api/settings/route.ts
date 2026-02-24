@@ -21,6 +21,7 @@ export async function GET() {
                 logo: "",
                 contactEmail: "",
                 contactPhone: "",
+                whatsappNumber: "", // Added whatsappNumber
                 address: "",
                 socialLinks: { facebook: "", instagram: "", twitter: "", linkedin: "" }
             };

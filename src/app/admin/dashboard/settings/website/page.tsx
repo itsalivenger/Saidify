@@ -52,11 +52,18 @@ interface Product {
     featured: boolean;
 }
 
+interface Category {
+    _id: string;
+    name: string;
+    image?: string;
+}
+
 export default function WebsiteControlPage() {
     const [activeTab, setActiveTab] = useState('home');
     const [activeAboutSection, setActiveAboutSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
     const [settings, setSettings] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [productLoading, setProductLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -70,6 +77,7 @@ export default function WebsiteControlPage() {
     useEffect(() => {
         fetchSettings();
         fetchProducts();
+        fetchCategories();
     }, []);
 
     const fetchSettings = async () => {
@@ -102,6 +110,18 @@ export default function WebsiteControlPage() {
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            const res = await fetch('/api/categories');
+            if (res.ok) {
+                const data = await res.json();
+                setCategories(data);
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
     const fetchProducts = async () => {
         setProductLoading(true);
         try {
@@ -131,6 +151,7 @@ export default function WebsiteControlPage() {
                 payload['mainSettings.logo'] = settings.mainSettings.logo;
                 payload['mainSettings.contactEmail'] = settings.mainSettings.contactEmail;
                 payload['mainSettings.contactPhone'] = settings.mainSettings.contactPhone;
+                payload['mainSettings.whatsappNumber'] = settings.mainSettings.whatsappNumber;
                 payload['mainSettings.address'] = settings.mainSettings.address;
                 payload['mainSettings.socialLinks'] = settings.mainSettings.socialLinks;
             }
@@ -508,6 +529,65 @@ export default function WebsiteControlPage() {
                             ))}
                         </div>
 
+                        <SectionCard title="Home Page Categories" description="Select up to 4 categories to display on the home page.">
+                            <div className="space-y-6">
+                                <Label>Selected Categories ({settings.homepage.selectedCategories?.length || 0}/4)</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {categories.map((cat) => {
+                                        const isSelected = settings.homepage.selectedCategories?.includes(cat._id);
+                                        return (
+                                            <button
+                                                key={cat._id}
+                                                onClick={() => {
+                                                    const currentSelected = settings.homepage.selectedCategories || [];
+                                                    if (isSelected) {
+                                                        setSettings({
+                                                            ...settings,
+                                                            homepage: {
+                                                                ...settings.homepage,
+                                                                selectedCategories: currentSelected.filter((id: string) => id !== cat._id)
+                                                            }
+                                                        });
+                                                    } else if (currentSelected.length < 4) {
+                                                        setSettings({
+                                                            ...settings,
+                                                            homepage: {
+                                                                ...settings.homepage,
+                                                                selectedCategories: [...currentSelected, cat._id]
+                                                            }
+                                                        });
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    "relative aspect-[4/3] rounded-2xl border-2 transition-all p-2 flex flex-col items-center justify-center gap-2 group",
+                                                    isSelected
+                                                        ? "border-purple-500 bg-purple-500/10"
+                                                        : "border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 hover:border-purple-500/30"
+                                                )}
+                                            >
+                                                {cat.image ? (
+                                                    <img src={cat.image} alt={cat.name} className="w-12 h-12 rounded-lg object-cover" />
+                                                ) : (
+                                                    <div className="w-12 h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
+                                                        <Tag className="w-6 h-6 text-neutral-400" />
+                                                    </div>
+                                                )}
+                                                <p className={cn("text-[10px] font-black uppercase text-center truncate w-full", isSelected ? "text-purple-600 dark:text-purple-400" : "text-neutral-500")}>
+                                                    {cat.name}
+                                                </p>
+                                                {isSelected && (
+                                                    <div className="absolute top-2 right-2 bg-purple-600 text-white rounded-full p-1 shadow-lg">
+                                                        <Check className="w-3 h-3" />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                {categories.length === 0 && <p className="text-xs text-muted-foreground italic">No categories found. Add categories in Products > Categories.</p>}
+                            </div>
+                        </SectionCard>
+
                         <SaveButton onClick={() => handleSave('homepage')} saving={saving} label="Save Home Page" />
                     </motion.div>
                 )}
@@ -847,6 +927,7 @@ export default function WebsiteControlPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <Field label="Contact Email" value={settings.mainSettings.contactEmail} onChange={(v) => updateGeneral('contactEmail', v)} placeholder="orders@yourstore.com" />
                                 <Field label="Contact Phone" value={settings.mainSettings.contactPhone} onChange={(v) => updateGeneral('contactPhone', v)} placeholder="+212 600 000 000" />
+                                <Field label="WhatsApp Number" value={settings.mainSettings.whatsappNumber} onChange={(v) => updateGeneral('whatsappNumber', v)} placeholder="+212 600 000 000" />
                             </div>
                             <Field label="Store Address" value={settings.mainSettings.address} onChange={(v) => updateGeneral('address', v)} placeholder="Physical store location" multiline />
                         </SectionCard>

@@ -40,6 +40,15 @@ function ShopContent() {
     const [sort, setSort] = useState("newest");
     const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
+    useEffect(() => {
+        const cat = searchParams.get("category");
+        if (cat) {
+            setSelectedCategory(cat);
+        } else {
+            setSelectedCategory("All");
+        }
+    }, [searchParams]);
+
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
@@ -73,10 +82,10 @@ function ShopContent() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch("/api/products/categories");
+                const res = await fetch("/api/categories");
                 if (res.ok) {
                     const data = await res.json();
-                    setCategories(data);
+                    setCategories(data.map((c: any) => c.name));
                 }
             } catch (error) {
                 console.error("Error fetching categories:", error);

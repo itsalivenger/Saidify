@@ -13,9 +13,9 @@ export default function WhatsAppButton() {
             const res = await fetch('/api/settings');
             if (res.ok) {
                 const data = await res.json();
-                const phone = data.mainSettings?.contactPhone;
+                const phone = data.mainSettings?.whatsappNumber;
                 if (phone) {
-                    const cleanPhone = phone.replace(/\s+/g, '').replace(/[()]/g, '');
+                    const cleanPhone = phone.replace(/\s+/g, '').replace(/[()]/g, '').replace(/^\+/, '');
                     setPhoneNumber(prev => prev === cleanPhone ? prev : cleanPhone);
                 }
             }
