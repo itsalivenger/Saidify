@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 
+const LocalizedString = {
+    en: { type: String, default: "" },
+    fr: { type: String, default: "" },
+    ar: { type: String, default: "" }
+};
+
 const CategorySchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true
-    },
+    name: LocalizedString,
     slug: {
         type: String,
         required: true,
@@ -17,10 +18,7 @@ const CategorySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    description: {
-        type: String,
-        trim: true
-    },
+    description: LocalizedString,
     image: {
         type: String,
         trim: true

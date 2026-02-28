@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import {
+    Globe, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Layout,
@@ -29,6 +30,7 @@ export default function AboutCMSPage() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [activeSection, setActiveSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
+    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
 
     useEffect(() => {
         fetchSettings();
@@ -294,14 +296,14 @@ export default function AboutCMSPage() {
                                     <div className="flex-1 space-y-3">
                                         <input
                                             type="text"
-                                            value={item.title}
-                                            onChange={(e) => updateItem('story', idx, 'title', e.target.value)}
+                                            value={item.title?.[editingLang] || ''}
+                                            onChange={(e) => updateItem('story', idx, 'title', { ...(item.title || {}), [editingLang]: e.target.value })}
                                             className="w-full bg-transparent border-none text-white font-black text-lg p-0 focus:ring-0"
                                             placeholder="Event Title..."
                                         />
                                         <textarea
-                                            value={item.description}
-                                            onChange={(e) => updateItem('story', idx, 'description', e.target.value)}
+                                            value={item.description?.[editingLang] || ''}
+                                            onChange={(e) => updateItem('story', idx, 'description', { ...(item.description || {}), [editingLang]: e.target.value })}
                                             className="w-full bg-transparent border-none text-gray-400 text-sm p-0 focus:ring-0 resize-none"
                                             placeholder="Description..."
                                             rows={2}
@@ -345,8 +347,8 @@ export default function AboutCMSPage() {
                                         <div className="flex-1">
                                             <input
                                                 type="text"
-                                                value={value.title}
-                                                onChange={(e) => updateItem('values', idx, 'title', e.target.value)}
+                                                value={value.title?.[editingLang] || ''}
+                                                onChange={(e) => updateItem('values', idx, 'title', { ...(value.title || {}), [editingLang]: e.target.value })}
                                                 className="w-full bg-transparent border-none text-white font-black p-0 focus:ring-0"
                                                 placeholder="Value Title..."
                                             />
@@ -359,8 +361,8 @@ export default function AboutCMSPage() {
                                         </button>
                                     </div>
                                     <textarea
-                                        value={value.description}
-                                        onChange={(e) => updateItem('values', idx, 'description', e.target.value)}
+                                        value={value.description?.[editingLang] || ''}
+                                        onChange={(e) => updateItem('values', idx, 'description', { ...(value.description || {}), [editingLang]: e.target.value })}
                                         className="w-full bg-transparent border-none text-gray-400 text-xs p-0 focus:ring-0 resize-none"
                                         placeholder="Value description..."
                                         rows={3}
@@ -417,8 +419,8 @@ export default function AboutCMSPage() {
                                         />
                                         <input
                                             type="text"
-                                            value={member.role}
-                                            onChange={(e) => updateItem('team', idx, 'role', e.target.value)}
+                                            value={member.role?.[editingLang] || ''}
+                                            onChange={(e) => updateItem('team', idx, 'role', { ...(member.role || {}), [editingLang]: e.target.value })}
                                             className="w-full bg-transparent border-none text-purple-400 font-bold p-0 focus:ring-0 text-[10px] uppercase tracking-widest"
                                             placeholder="Role"
                                         />
@@ -448,6 +450,33 @@ export default function AboutCMSPage() {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+
+function LocalizedField({ label, obj, lang, onChange, placeholder, multiline }: { label: string; obj: any; lang: string; onChange: (v: any) => void; placeholder?: string; multiline?: boolean }) {
+    const value = obj?.[lang] || '';
+    return (
+        <div className="space-y-2">
+            <Label>{label} ({lang.toUpperCase()})</Label>
+            {multiline ? (
+                <textarea
+                    value={value}
+                    onChange={(e) => onChange({ ...(obj || {}), [lang]: e.target.value })}
+                    placeholder={placeholder}
+                    rows={4}
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all resize-none font-medium text-sm leading-relaxed"
+                />
+            ) : (
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange({ ...(obj || {}), [lang]: e.target.value })}
+                    placeholder={placeholder}
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium text-sm"
+                />
+            )}
         </div>
     );
 }

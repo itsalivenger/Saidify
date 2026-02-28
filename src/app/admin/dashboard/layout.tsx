@@ -36,24 +36,22 @@ export default function AdminDashboardLayout({
     const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.includes('/settings'));
     const [isDesignerOpen, setIsDesignerOpen] = useState(pathname.includes('/blanks'));
     const [isWebsiteOpen, setIsWebsiteOpen] = useState(pathname.includes('/website') || pathname.includes('/about'));
-    const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
-        if (typeof window !== 'undefined') {
-            const user = localStorage.getItem('adminUser');
-            if (user) {
-                try {
-                    return JSON.parse(user);
-                } catch {
-                    return null;
-                }
-            }
-        }
-        return null;
-    });
+    const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
         if (!token) {
             router.push('/admin/login');
+            return;
+        }
+
+        const userStr = localStorage.getItem('adminUser');
+        if (userStr) {
+            try {
+                setAdminUser(JSON.parse(userStr));
+            } catch {
+                setAdminUser(null);
+            }
         }
     }, [router]);
 

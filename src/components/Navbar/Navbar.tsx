@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingBag, Search, User, Heart, Wand2 } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, User, Heart, Wand2, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useCart } from "@/context/CartContext";
@@ -24,6 +24,14 @@ export default function Navbar() {
     const { items: wishlistItems } = useWishlist();
     const searchInputRef = useRef<HTMLInputElement>(null);
     const [settings, setSettings] = useState<any>(null);
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const [currentLang, setCurrentLang] = useState("EN");
+
+    const languages = [
+        { code: "EN", name: "English" },
+        { code: "FR", name: "Français" },
+        { code: "AR", name: "العربية" },
+    ];
 
     // Fetch Site Settings
     useEffect(() => {
@@ -242,6 +250,46 @@ export default function Navbar() {
                                 </Link>
                             )}
 
+                            {/* Language Dropdown */}
+                            <div className="relative" onMouseLeave={() => setIsLangOpen(false)}>
+                                <button
+                                    onMouseEnter={() => setIsLangOpen(true)}
+                                    onClick={() => setIsLangOpen(!isLangOpen)}
+                                    className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent flex items-center gap-1"
+                                >
+                                    <Globe className="w-5 h-5" />
+                                    <span className="text-xs font-bold hidden sm:block">{currentLang}</span>
+                                </button>
+                                <AnimatePresence>
+                                    {isLangOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden z-[60]"
+                                        >
+                                            <div className="flex flex-col p-1">
+                                                {languages.map((l) => (
+                                                    <button
+                                                        key={l.code}
+                                                        onClick={() => {
+                                                            setCurrentLang(l.code);
+                                                            setIsLangOpen(false);
+                                                        }}
+                                                        className={cn(
+                                                            "text-left text-sm px-4 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors",
+                                                            currentLang === l.code ? "font-bold text-primary" : "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {l.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
                             <Link
                                 href={isAuthenticated ? "/profile" : "/login"}
                                 className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent hidden sm:block flex items-center gap-2"
@@ -358,6 +406,36 @@ export default function Navbar() {
                                     </Link>
                                 </motion.div>
                             )}
+
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: (navLinks.length + 3) * 0.1 }}
+                                className="py-2 border-b border-muted"
+                            >
+                                <div className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                                    <Globe className="w-4 h-4" />
+                                    Select Language
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {languages.map((l) => (
+                                        <button
+                                            key={l.code}
+                                            onClick={() => {
+                                                setCurrentLang(l.code);
+                                            }}
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-sm font-medium transition-all border",
+                                                currentLang === l.code
+                                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                                    : "bg-transparent text-muted-foreground border-neutral-200 dark:border-neutral-800 hover:border-primary/50"
+                                            )}
+                                        >
+                                            {l.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
 
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}

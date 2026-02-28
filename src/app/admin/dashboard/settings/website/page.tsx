@@ -70,6 +70,7 @@ interface Category {
 export default function WebsiteControlPage() {
     const [activeTab, setActiveTab] = useState('home');
     const [activeAboutSection, setActiveAboutSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
+    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
     const [settings, setSettings] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -409,23 +410,50 @@ export default function WebsiteControlPage() {
             </AnimatePresence>
 
             {/* Global Tabs */}
-            <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit mb-10">
-                {TABS.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={cn(
-                            "flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-black transition-all",
-                            activeTab === tab.id
-                                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
-                                : "text-gray-500 hover:text-gray-300"
-                        )}
-                    >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.label}
-                    </button>
-                ))}
+            
+            {/* Global Tabs & Language */}
+            <div className="flex flex-col md:flex-row justify-between mb-10 gap-4">
+                <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit">
+                    {TABS.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                                "flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-black transition-all",
+                                activeTab === tab.id
+                                    ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                                    : "text-gray-500 hover:text-gray-300"
+                            )}
+                        >
+                            <tab.icon className="w-4 h-4" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+                
+                <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit h-fit">
+                    {[
+                        { id: 'en', label: 'English' },
+                        { id: 'fr', label: 'Français' },
+                        { id: 'ar', label: 'العربية' },
+                    ].map((lang) => (
+                        <button
+                            key={lang.id}
+                            onClick={() => setEditingLang(lang.id as 'en'|'fr'|'ar')}
+                            className={cn(
+                                "flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-black transition-all",
+                                editingLang === lang.id
+                                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                    : "text-gray-500 hover:text-gray-300"
+                            )}
+                        >
+                            <Globe className="w-4 h-4" />
+                            {lang.label}
+                        </button>
+                    ))}
+                </div>
             </div>
+
 
             {/* Content Tabs */}
             <AnimatePresence mode="wait">
@@ -451,12 +479,12 @@ export default function WebsiteControlPage() {
                                     </div>
                                 </div>
                             </div>
-                            <Field label="Badge Text" value={settings.homepage.hero.badge} onChange={(v) => updateHero('badge', v)} placeholder="e.g. New Collection 2024" />
-                            <Field label="Main Title" value={settings.homepage.hero.title} onChange={(v) => updateHero('title', v)} placeholder="Enter the hero headline" multiline />
-                            <Field label="Subtitle" value={settings.homepage.hero.subtitle} onChange={(v) => updateHero('subtitle', v)} placeholder="Enter the supporting text" multiline />
+                            <LocalizedField label="Badge Text" obj={settings.homepage.hero.badge} lang={editingLang} onChange={(v) => updateHero('badge', v)} placeholder="e.g. New Collection 2024" />
+                            <LocalizedField label="Main Title" obj={settings.homepage.hero.title} lang={editingLang} onChange={(v) => updateHero('title', v)} placeholder="Enter the hero headline" multiline />
+                            <LocalizedField label="Subtitle" obj={settings.homepage.hero.subtitle} lang={editingLang} onChange={(v) => updateHero('subtitle', v)} placeholder="Enter the supporting text" multiline />
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="Primary CTA Button" value={settings.homepage.hero.ctaPrimary} onChange={(v) => updateHero('ctaPrimary', v)} placeholder="e.g. Shop Now" />
-                                <Field label="Secondary CTA Button" value={settings.homepage.hero.ctaSecondary} onChange={(v) => updateHero('ctaSecondary', v)} placeholder="e.g. Explore Collection" />
+                                <LocalizedField label="Primary CTA Button" obj={settings.homepage.hero.ctaPrimary} lang={editingLang} onChange={(v) => updateHero('ctaPrimary', v)} placeholder="e.g. Shop Now" />
+                                <LocalizedField label="Secondary CTA Button" obj={settings.homepage.hero.ctaSecondary} lang={editingLang} onChange={(v) => updateHero('ctaSecondary', v)} placeholder="e.g. Explore Collection" />
                             </div>
                         </SectionCard>
 
@@ -493,16 +521,16 @@ export default function WebsiteControlPage() {
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="Main Title" value={settings.homepage.promoBanner.title} onChange={(v) => updatePromo('title', v)} placeholder="e.g. End of Season" />
-                                <Field label="Subtitle / Highlight" value={settings.homepage.promoBanner.subtitle} onChange={(v) => updatePromo('subtitle', v)} placeholder="e.g. Clearance Sale" />
+                                <LocalizedField label="Main Title" obj={settings.homepage.promoBanner.title} lang={editingLang} onChange={(v) => updatePromo('title', v)} placeholder="e.g. End of Season" />
+                                <LocalizedField label="Subtitle / Highlight" obj={settings.homepage.promoBanner.subtitle} lang={editingLang} onChange={(v) => updatePromo('subtitle', v)} placeholder="e.g. Clearance Sale" />
                             </div>
-                            <Field label="Description" value={settings.homepage.promoBanner.description} onChange={(v) => updatePromo('description', v)} placeholder="Enter the promotional description" multiline />
-                            <Field label="CTA Button Text" value={settings.homepage.promoBanner.ctaText} onChange={(v) => updatePromo('ctaText', v)} placeholder="e.g. Shop The Sale" />
+                            <LocalizedField label="Description" obj={settings.homepage.promoBanner.description} lang={editingLang} onChange={(v) => updatePromo('description', v)} placeholder="Enter the promotional description" multiline />
+                            <LocalizedField label="CTA Button Text" obj={settings.homepage.promoBanner.ctaText} lang={editingLang} onChange={(v) => updatePromo('ctaText', v)} placeholder="e.g. Shop The Sale" />
                         </SectionCard>
 
                         <SectionCard title="Newsletter Section" description="The email subscription section at the bottom of the homepage.">
-                            <Field label="Headline" value={settings.homepage.newsletter.title} onChange={(v) => updateNewsletter('title', v)} placeholder="e.g. Join the Club" />
-                            <Field label="Subtitle" value={settings.homepage.newsletter.subtitle} onChange={(v) => updateNewsletter('subtitle', v)} placeholder="Enter the newsletter subtext" multiline />
+                            <LocalizedField label="Headline" obj={settings.homepage.newsletter.title} lang={editingLang} onChange={(v) => updateNewsletter('title', v)} placeholder="e.g. Join the Club" />
+                            <LocalizedField label="Subtitle" obj={settings.homepage.newsletter.subtitle} lang={editingLang} onChange={(v) => updateNewsletter('subtitle', v)} placeholder="Enter the newsletter subtext" multiline />
                         </SectionCard>
 
                         <div className="space-y-4">
@@ -1035,6 +1063,33 @@ function Field({ label, value, onChange, placeholder, multiline }: { label: stri
                     type="text"
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium text-sm"
+                />
+            )}
+        </div>
+    );
+}
+
+
+function LocalizedField({ label, obj, lang, onChange, placeholder, multiline }: { label: string; obj: any; lang: string; onChange: (v: any) => void; placeholder?: string; multiline?: boolean }) {
+    const value = obj?.[lang] || '';
+    return (
+        <div className="space-y-2">
+            <Label>{label} ({lang.toUpperCase()})</Label>
+            {multiline ? (
+                <textarea
+                    value={value}
+                    onChange={(e) => onChange({ ...(obj || {}), [lang]: e.target.value })}
+                    placeholder={placeholder}
+                    rows={4}
+                    className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all resize-none font-medium text-sm leading-relaxed"
+                />
+            ) : (
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange({ ...(obj || {}), [lang]: e.target.value })}
                     placeholder={placeholder}
                     className="w-full px-5 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium text-sm"
                 />

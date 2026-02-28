@@ -36,11 +36,12 @@ export default function CategoriesPage() {
 
     // Form state
     const [formData, setFormData] = useState({
-        name: '',
+        name: { en: '', fr: '', ar: '' },
         active: true,
-        description: '',
+        description: { en: '', fr: '', ar: '' },
         image: ''
     });
+    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -80,7 +81,7 @@ export default function CategoriesPage() {
                 await fetchCategories();
                 setIsAdding(false);
                 setEditingId(null);
-                setFormData({ name: '', active: true, description: '', image: '' });
+                setFormData({ name: { en: '', fr: '', ar: '' }, active: true, description: { en: '', fr: '', ar: '' }, image: '' });
             }
         } catch (error) {
             console.error('Error saving category:', error);
@@ -167,7 +168,7 @@ export default function CategoriesPage() {
                         onClick={() => {
                             setIsAdding(true);
                             setEditingId(null);
-                            setFormData({ name: '', active: true, description: '', image: '' });
+                            setFormData({ name: { en: '', fr: '', ar: '' }, active: true, description: { en: '', fr: '', ar: '' }, image: '' });
                         }}
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20"
                     >
@@ -194,14 +195,38 @@ export default function CategoriesPage() {
                             </button>
                         </div>
 
+                        
+                        <div className="flex justify-between items-center bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit mb-6">
+                            {[
+                                { id: 'en', label: 'English' },
+                                { id: 'fr', label: 'Français' },
+                                { id: 'ar', label: 'العربية' },
+                            ].map((lang) => (
+                                <button
+                                    key={lang.id}
+                                    type="button"
+                                    onClick={() => setEditingLang(lang.id as 'en'|'fr'|'ar')}
+                                    className={cn(
+                                        "flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-black transition-all",
+                                        editingLang === lang.id
+                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                            : "text-gray-500 hover:text-gray-300"
+                                    )}
+                                >
+                                    <Globe className="w-4 h-4" />
+                                    {lang.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Name</label>
+                                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Name ({editingLang.toUpperCase()})</label>
                                 <input
                                     type="text"
-                                    required
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required={editingLang === 'en'}
+                                    value={formData.name?.[editingLang] || ''}
+                                    onChange={(e) => setFormData({ ...formData, name: { ...(formData.name || {}), [editingLang]: e.target.value } })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                                     placeholder="e.g. Winter Collection"
                                 />
@@ -225,11 +250,11 @@ export default function CategoriesPage() {
                             </div>
 
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Description</label>
+                                <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Description ({editingLang.toUpperCase()})</label>
                                 <textarea
                                     rows={2}
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    value={formData.description?.[editingLang] || ''}
+                                    onChange={(e) => setFormData({ ...formData, description: { ...(formData.description || {}), [editingLang]: e.target.value } })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
                                     placeholder="Brief description of this category..."
                                 />
