@@ -5,6 +5,7 @@ import { Star, Truck, ShieldCheck, ArrowRight, Minus, Plus, Wand2 } from "lucide
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductInfoProps {
     product: {
@@ -24,6 +25,7 @@ interface ProductInfoProps {
 import { useCart } from "@/context/CartContext";
 
 export default function ProductInfo({ product, description }: ProductInfoProps) {
+    const { t } = useLanguage();
     const [selectedSize, setSelectedSize] = useState(product.sizes && product.sizes.length > 0 ? product.sizes[0] : "");
     const [selectedColor, setSelectedColor] = useState(product.colors && product.colors.length > 0 ? product.colors[0].name : "");
     const [quantity, setQuantity] = useState(1);
@@ -158,7 +160,7 @@ export default function ProductInfo({ product, description }: ProductInfoProps) 
                                 : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/25 hover:shadow-purple-500/40"
                         )}
                     >
-                        {isAdded ? "Added!" : `Add to Cart`}
+                        {isAdded ? "✓" : t.common.addToCart}
                     </button>
                 )}
             </div>

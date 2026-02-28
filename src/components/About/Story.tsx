@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface StoryProps {
     data?: {
@@ -37,6 +39,7 @@ const DEFAULT_TIMELINE = [
 ];
 
 export default function Story({ data }: StoryProps) {
+    const { language } = useLanguage();
     const title = data?.title || "Our Journey";
     const timeline = data?.timeline?.length ? data.timeline : DEFAULT_TIMELINE;
 
@@ -67,8 +70,8 @@ export default function Story({ data }: StoryProps) {
                                         <span className="text-5xl font-black text-neutral-200 dark:text-neutral-800 absolute -z-10 select-none transform -translate-y-8 scale-150 opacity-50">
                                             {item.year}
                                         </span>
-                                        <h3 className="text-2xl font-bold mb-2 relative z-10">{item.title}</h3>
-                                        <p className="text-muted-foreground relative z-10">{item.description}</p>
+                                        <h3 className="text-2xl font-bold mb-2 relative z-10">{getLocalizedText(item.title, language)}</h3>
+                                        <p className="text-muted-foreground relative z-10">{getLocalizedText(item.description, language)}</p>
                                     </div>
                                 </div>
 

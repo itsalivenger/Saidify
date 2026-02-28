@@ -6,8 +6,10 @@ import Link from "next/link";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import AuthInput from "@/components/Auth/AuthInput";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SignupPage() {
+    const { t } = useLanguage();
     const { isAuthenticated, loading: authLoading } = useAuth();
     const [formData, setFormData] = useState({
         firstName: "",
@@ -71,14 +73,14 @@ export default function SignupPage() {
 
     return (
         <AuthLayout
-            title="Create an account"
-            subtitle="Join thousands of others and start your journey"
+            title={t.pages.auth.signupTitle}
+            subtitle={t.pages.auth.signupSub}
             image="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2670&auto=format&fit=crop"
         >
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-4">
                     <AuthInput
-                        label="First Name"
+                        label={t.pages.auth.firstName}
                         type="text"
                         placeholder="John"
                         required
@@ -86,7 +88,7 @@ export default function SignupPage() {
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     />
                     <AuthInput
-                        label="Last Name"
+                        label={t.pages.auth.lastName}
                         type="text"
                         placeholder="Doe"
                         required
@@ -95,7 +97,7 @@ export default function SignupPage() {
                     />
                 </div>
                 <AuthInput
-                    label="Email"
+                    label={t.pages.auth.email}
                     type="email"
                     placeholder="name@example.com"
                     required
@@ -103,7 +105,7 @@ export default function SignupPage() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
                 <AuthInput
-                    label="Phone Number"
+                    label={t.pages.auth.phone}
                     type="tel"
                     placeholder="+212 600 000000"
                     required
@@ -111,7 +113,7 @@ export default function SignupPage() {
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
                 <AuthInput
-                    label="Password"
+                    label={t.pages.auth.password}
                     type="password"
                     placeholder="Create a password"
                     required
@@ -119,7 +121,7 @@ export default function SignupPage() {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <AuthInput
-                    label="Confirm Password"
+                    label={t.pages.auth.confirmPass}
                     type="password"
                     placeholder="Confirm your password"
                     required
@@ -141,13 +143,13 @@ export default function SignupPage() {
                         required
                     />
                     <label htmlFor="terms" className="text-sm text-muted-foreground">
-                        I agree to the{" "}
+                        {t.pages.auth.agreeTerms}{" "}
                         <Link href="/terms" className="underline hover:text-foreground">
-                            Terms of Service
+                            {t.pages.auth.terms}
                         </Link>{" "}
-                        and{" "}
+                        {t.pages.auth.and}{" "}
                         <Link href="/privacy" className="underline hover:text-foreground">
-                            Privacy Policy
+                            {t.pages.auth.privacy}
                         </Link>
                     </label>
                 </div>
@@ -156,13 +158,13 @@ export default function SignupPage() {
                     disabled={loading}
                     className="w-full bg-white text-black h-12 rounded-xl font-bold hover:bg-neutral-200 transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-70 flex items-center justify-center gap-2"
                 >
-                    {loading ? "Creating Account..." : "Create Account"}
+                    {loading ? t.pages.auth.creatingAccount : t.pages.auth.createAccount}
                 </button>
 
                 <p className="text-center text-sm text-muted-foreground mt-6">
-                    Already have an account?{" "}
+                    {t.pages.auth.hasAccount}{" "}
                     <Link href="/login" className="font-bold text-foreground hover:text-primary transition-colors">
-                        Log in
+                        {t.pages.auth.logInLink}
                     </Link>
                 </p>
             </form>

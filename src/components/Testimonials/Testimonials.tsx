@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +22,8 @@ const AVATAR_COLORS = [
 ];
 
 export default function Testimonials() {
+    const { language } = useLanguage();
+
     const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
 
     useEffect(() => {
@@ -87,7 +91,7 @@ export default function Testimonials() {
                             </div>
 
                             <p className="text-lg text-foreground/80 mb-8 leading-relaxed">
-                                &ldquo;{testimonial.content}&rdquo;
+                                &ldquo;{getLocalizedText(testimonial.content, language)}&rdquo;
                             </p>
 
                             <div className="flex items-center gap-4">
@@ -99,7 +103,7 @@ export default function Testimonials() {
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-foreground">{testimonial.author}</h4>
-                                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                                    <p className="text-sm text-muted-foreground">{getLocalizedText(testimonial.role, language)}</p>
                                 </div>
                             </div>
                         </motion.div>

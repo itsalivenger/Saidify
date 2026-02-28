@@ -6,8 +6,10 @@ import ContactForm from "@/components/Contact/ContactForm";
 import ContactInfo from "@/components/Contact/ContactInfo";
 import MapEmbed from "@/components/Contact/MapEmbed";
 import FAQ from "@/components/Contact/FAQ";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ContactPage() {
+    const { t } = useLanguage();
     return (
         <main className="min-h-screen bg-background pb-20">
             {/* Header */}
@@ -18,7 +20,7 @@ export default function ContactPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-6xl font-bold mb-6"
                     >
-                        Get in Touch
+                        {t.pages.contact.title}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -26,7 +28,7 @@ export default function ContactPage() {
                         transition={{ delay: 0.1 }}
                         className="text-xl text-neutral-400 max-w-2xl mx-auto"
                     >
-                        We'd love to hear from you. Please send us a message or visit us at our store.
+                        {t.pages.contact.subtitle}
                     </motion.p>
                 </div>
             </section>

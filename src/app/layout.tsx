@@ -36,6 +36,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ConfirmProvider } from "@/context/ConfirmContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import WhatsAppButton from "@/components/Common/WhatsAppButton";
 
 export default function RootLayout({
@@ -48,16 +49,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <ConfirmProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <ConditionalLayout>{children}</ConditionalLayout>
-                <WhatsAppButton />
-              </WishlistProvider>
-            </CartProvider>
-          </ConfirmProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <ConfirmProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <ConditionalLayout>{children}</ConditionalLayout>
+                  <WhatsAppButton />
+                </WishlistProvider>
+              </CartProvider>
+            </ConfirmProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

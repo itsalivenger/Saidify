@@ -5,15 +5,19 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Layers, Loader2 } from "lucide-react";
 import Breadcrumbs from "@/components/Shop/Breadcrumbs";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface Category {
     _id: string;
-    name: string;
+    name: any;
     active: boolean;
     image?: string;
+    slug?: string;
 }
 
 export default function CategoriesPage() {
+    const { t, language } = useLanguage();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -39,10 +43,9 @@ export default function CategoriesPage() {
             <div className="container mx-auto max-w-[1200px]">
                 <Breadcrumbs />
                 <div className="mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">Our Collections</h1>
+                    <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">{t.pages.categories.title}</h1>
                     <p className="text-muted-foreground text-lg max-w-2xl">
-                        Explore our curated selection of luxury items across various categories.
-                        Find the perfect match for your style.
+                        {t.pages.categories.subtitle}
                     </p>
                 </div>
 
@@ -60,7 +63,7 @@ export default function CategoriesPage() {
                                 transition={{ delay: index * 0.1 }}
                             >
                                 <Link
-                                    href={`/shop?category=${encodeURIComponent(cat.name)}`}
+                                    href={`/shop?category=${encodeURIComponent(cat.slug || (typeof cat.name === 'string' ? cat.name : cat.name?.en || ''))}`}
                                     className="group block relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-900 aspect-[4/3] border border-neutral-200 dark:border-neutral-800"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity" />
@@ -68,7 +71,7 @@ export default function CategoriesPage() {
                                     {/* Image or Placeholder */}
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         {cat.image ? (
-                                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                            <img src={cat.image} alt={getLocalizedText(cat.name, language)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         ) : (
                                             <Layers className="w-20 h-20 text-neutral-300 dark:text-neutral-700 opacity-20 group-hover:scale-110 transition-transform duration-500" />
                                         )}
@@ -76,10 +79,10 @@ export default function CategoriesPage() {
 
                                     <div className="absolute inset-x-0 bottom-0 p-8 z-20">
                                         <h2 className="text-3xl font-black text-white mb-2 group-hover:translate-x-2 transition-transform duration-300">
-                                            {cat.name}
+                                            {getLocalizedText(cat.name, language)}
                                         </h2>
                                         <div className="flex items-center gap-2 text-white/60 font-bold text-sm tracking-wider uppercase opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                            Explore Gallery <ArrowRight className="w-4 h-4" />
+                                            {t.pages.categories.explore} <ArrowRight className="w-4 h-4" />
                                         </div>
                                     </div>
                                 </Link>

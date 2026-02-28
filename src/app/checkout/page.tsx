@@ -20,11 +20,13 @@ import {
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
 import AuthModal from '@/components/Auth/AuthModal';
 
 export default function CheckoutPage() {
     const { items, subtotal, totalItems } = useCart();
+    const { t } = useLanguage();
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -108,13 +110,13 @@ export default function CheckoutPage() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
                 <ShoppingBag className="w-16 h-16 text-neutral-300 mb-4" />
-                <h1 className="text-2xl font-black mb-2">Your cart is empty</h1>
-                <p className="text-muted-foreground mb-8 text-center">Looks like you haven't added anything to your cart yet.</p>
+                <h1 className="text-2xl font-black mb-2">{t.pages.checkout.emptyTitle}</h1>
+                <p className="text-muted-foreground mb-8 text-center">{t.pages.checkout.emptySub}</p>
                 <Link
                     href="/shop"
                     className="bg-purple-600 text-white px-8 py-3 rounded-full font-bold hover:bg-purple-700 transition-all"
                 >
-                    Return to Shop
+                    {t.pages.checkout.returnShop}
                 </Link>
             </div>
         );
@@ -133,7 +135,7 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between mb-12">
                     <Link href="/shop" className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors group">
                         <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-bold">Back to Shop</span>
+                        <span className="font-bold">{t.pages.checkout.backShop}</span>
                     </Link>
                     <div className="flex items-center gap-2">
                         {[1, 2].map((i) => (
@@ -161,8 +163,8 @@ export default function CheckoutPage() {
                                     className="space-y-8"
                                 >
                                     <div>
-                                        <h1 className="text-4xl font-black mb-2">Checkout</h1>
-                                        <p className="text-neutral-400 font-medium">Please provide your shipping details to complete the request.</p>
+                                        <h1 className="text-4xl font-black mb-2">{t.pages.checkout.title}</h1>
+                                        <p className="text-neutral-400 font-medium">{t.pages.checkout.subtitle}</p>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -255,7 +257,7 @@ export default function CheckoutPage() {
                                                 <Loader2 className="w-6 h-6 animate-spin" />
                                             ) : (
                                                 <>
-                                                    Place Order Request <ArrowRight className="w-6 h-6" />
+                                                    {t.pages.checkout.placeOrder} <ArrowRight className="w-6 h-6" />
                                                 </>
                                             )}
                                         </button>
@@ -279,9 +281,9 @@ export default function CheckoutPage() {
                                     <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/20">
                                         <CheckCircle2 className="w-12 h-12 text-white" />
                                     </div>
-                                    <h1 className="text-5xl font-black mb-4">Request Sent!</h1>
+                                    <h1 className="text-5xl font-black mb-4">{t.pages.checkout.successTitle}</h1>
                                     <p className="text-neutral-400 max-w-md mx-auto mb-12 font-medium">
-                                        Thank you, {formData.firstName}. We've received your order request and are preparing it. You'll receive a confirmation email shortly with the next steps.
+                                        {t.pages.checkout.successSub}
                                     </p>
                                     <Link
                                         href="/shop"

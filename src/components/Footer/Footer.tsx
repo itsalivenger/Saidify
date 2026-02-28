@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Facebook, Instagram, Twitter, CreditCard, Linkedin } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 
 interface SiteSettings {
@@ -21,6 +22,7 @@ interface SiteSettings {
 }
 
 export default function Footer() {
+    const { t } = useLanguage();
     const [settings, setSettings] = useState<SiteSettings | null>(null);
 
     useEffect(() => {
@@ -84,37 +86,37 @@ export default function Footer() {
 
                     {/* Shop Column */}
                     <div>
-                        <h4 className="text-white font-bold mb-6">Shop</h4>
+                        <h4 className="text-white font-bold mb-6">{t.footer.shop}</h4>
                         <ul className="space-y-4">
-                            <li><Link href="/shop?sort=Newest Arrivals" className="hover:text-white transition-colors">New Arrivals</Link></li>
-                            <li><Link href="/shop?sort=Best Selling" className="hover:text-white transition-colors">Best Sellers</Link></li>
-                            <li><Link href="/design" className="hover:text-white transition-colors">Design Studio</Link></li>
-                            <li><Link href="/categories" className="hover:text-white transition-colors">Categories</Link></li>
-                            <li><Link href="/shop?category=Accessories" className="hover:text-white transition-colors">Accessories</Link></li>
+                            <li><Link href="/shop?sort=Newest Arrivals" className="hover:text-white transition-colors">{t.footer.newArrivals}</Link></li>
+                            <li><Link href="/shop?sort=Best Selling" className="hover:text-white transition-colors">{t.footer.bestSellers}</Link></li>
+                            <li><Link href="/design" className="hover:text-white transition-colors">{t.footer.designStudio}</Link></li>
+                            <li><Link href="/categories" className="hover:text-white transition-colors">{t.footer.categories}</Link></li>
+                            <li><Link href="/shop?category=Accessories" className="hover:text-white transition-colors">{t.footer.accessories}</Link></li>
                         </ul>
                     </div>
 
                     {/* Company Column */}
                     <div>
-                        <h4 className="text-white font-bold mb-6">Company</h4>
+                        <h4 className="text-white font-bold mb-6">{t.footer.company}</h4>
                         <ul className="space-y-4">
-                            <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-                            <li><Link href="/about#values" className="hover:text-white transition-colors">Our Values</Link></li>
-                            <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                            <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                            <li><Link href="/about#mission" className="hover:text-white transition-colors">Sustainability</Link></li>
+                            <li><Link href="/about" className="hover:text-white transition-colors">{t.footer.aboutUs}</Link></li>
+                            <li><Link href="/about#values" className="hover:text-white transition-colors">{t.footer.ourValues}</Link></li>
+                            <li><Link href="/terms" className="hover:text-white transition-colors">{t.footer.terms}</Link></li>
+                            <li><Link href="/privacy" className="hover:text-white transition-colors">{t.footer.privacy}</Link></li>
+                            <li><Link href="/about#mission" className="hover:text-white transition-colors">{t.footer.sustainability}</Link></li>
                         </ul>
                     </div>
 
                     {/* Support Column */}
                     <div>
-                        <h4 className="text-white font-bold mb-6">Support</h4>
+                        <h4 className="text-white font-bold mb-6">{t.footer.support}</h4>
                         <ul className="space-y-4">
-                            <li><Link href="/contact" className="hover:text-white transition-colors">Help Center</Link></li>
-                            <li><Link href="/profile" className="hover:text-white transition-colors">Order Status</Link></li>
-                            <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
-                            <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
-                            <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                            <li><Link href="/contact" className="hover:text-white transition-colors">{t.footer.helpCenter}</Link></li>
+                            <li><Link href="/profile" className="hover:text-white transition-colors">{t.footer.orderStatus}</Link></li>
+                            <li><Link href="/returns" className="hover:text-white transition-colors">{t.footer.returns}</Link></li>
+                            <li><Link href="/shipping" className="hover:text-white transition-colors">{t.footer.shipping}</Link></li>
+                            <li><Link href="/contact" className="hover:text-white transition-colors">{t.footer.contactUs}</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -122,7 +124,7 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-sm text-neutral-500">
-                        &copy; {new Date().getFullYear()} {info.siteName || "Said Store"}. All rights reserved.
+                        &copy; {new Date().getFullYear()} {info.siteName || "Said Store"}. {t.footer.rights}
                     </p>
                     <div className="flex gap-4 opacity-50">
                         <CreditCard className="w-6 h-6" />

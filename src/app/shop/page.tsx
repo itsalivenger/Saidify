@@ -20,9 +20,11 @@ interface Product {
 }
 
 import { useSearchParams } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 function ShopContent() {
     const searchParams = useSearchParams();
+    const { t } = useLanguage();
     const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
@@ -131,8 +133,8 @@ function ShopContent() {
                     <Breadcrumbs />
                     <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl font-black tracking-tight">{selectedCategory === 'All' ? 'All Products' : selectedCategory}</h1>
-                            <p className="text-muted-foreground mt-1">Discover our curated collection of premium products</p>
+                            <h1 className="text-3xl font-black tracking-tight">{selectedCategory === 'All' ? t.pages.shop.allProducts : selectedCategory}</h1>
+                            <p className="text-muted-foreground mt-1">{t.pages.shop.subtitle}</p>
                         </div>
                     </div>
                 </div>

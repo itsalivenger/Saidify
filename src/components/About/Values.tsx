@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 import { Leaf, Award, Heart, ShieldCheck, Users, Target, Globe, Zap, Star, Smile } from "lucide-react";
 
 const ICON_MAP: any = {
@@ -39,6 +41,7 @@ const DEFAULT_VALUES = [
 ];
 
 export default function Values({ data }: ValuesProps) {
+    const { language } = useLanguage();
     const values = data?.length ? data : DEFAULT_VALUES;
 
     return (
@@ -59,9 +62,9 @@ export default function Values({ data }: ValuesProps) {
                                 <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6 text-white group-hover:bg-white group-hover:text-black transition-all duration-300">
                                     <Icon className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3">{value.title}</h3>
+                                <h3 className="text-xl font-bold mb-3">{getLocalizedText(value.title, language)}</h3>
                                 <p className="text-neutral-400 leading-relaxed">
-                                    {value.description}
+                                    {getLocalizedText(value.description, language)}
                                 </p>
                             </motion.div>
                         );

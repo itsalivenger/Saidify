@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, ShoppingBag, Heart } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Product {
     id: string | number;
@@ -21,6 +22,7 @@ interface QuickViewModalProps {
 }
 
 export default function QuickViewModal({ isOpen, onClose, product }: QuickViewModalProps) {
+    const { t } = useLanguage();
     if (!product) return null;
 
     return (
@@ -73,7 +75,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                                                 <Star key={i} className="w-4 h-4 fill-current" />
                                             ))}
                                         </div>
-                                        <span className="text-sm text-muted-foreground">(128 reviews)</span>
+                                        <span className="text-sm text-muted-foreground">({product.rating || 128} {t.common.reviews})</span>
                                     </div>
                                     <p className="text-2xl font-bold">{product.price}</p>
                                 </div>
@@ -87,7 +89,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                                     <div className="flex gap-4">
                                         <button className="flex-1 bg-black text-white dark:bg-white dark:text-black py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
                                             <ShoppingBag className="w-5 h-5" />
-                                            Add to Cart
+                                            {t.common.addToCart}
                                         </button>
                                         <button className="p-4 border border-neutral-200 dark:border-neutral-700 rounded-full hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
                                             <Heart className="w-5 h-5" />
@@ -97,7 +99,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                                         onClick={onClose}
                                         className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
-                                        View Full Details
+                                        {t.common.viewFullDetails}
                                     </button>
                                 </div>
                             </div>

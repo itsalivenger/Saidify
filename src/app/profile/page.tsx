@@ -20,9 +20,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import Breadcrumbs from "@/components/Shop/Breadcrumbs";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ProfilePage() {
     const { user, loading, isAuthenticated, logout } = useAuth();
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState("orders");
     const [orders, setOrders] = useState<any[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(true);
@@ -165,7 +167,7 @@ export default function ProfilePage() {
                                                 href="/shop"
                                                 className="bg-black text-white dark:bg-white dark:text-black px-8 py-4 rounded-2xl font-black inline-flex items-center gap-2 hover:scale-[1.02] transition-transform active:scale-[0.98]"
                                             >
-                                                Start Shopping <ArrowRight className="w-4 h-4" />
+                                                {t.pages.cart.startShopping} <ArrowRight className="w-4 h-4" />
                                             </Link>
                                         </div>
                                     ) : (

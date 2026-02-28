@@ -3,6 +3,8 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useCart, CartItem as CartItemType } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface CartItemProps {
     item: CartItemType;
@@ -10,6 +12,7 @@ interface CartItemProps {
 
 export default function CartItem({ item }: CartItemProps) {
     const { updateQuantity, removeFromCart } = useCart();
+    const { t, language } = useLanguage();
 
     return (
         <div className="flex gap-4 md:gap-6 py-6 border-b border-neutral-200 dark:border-neutral-800 last:border-0">
@@ -66,7 +69,7 @@ export default function CartItem({ item }: CartItemProps) {
                         className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1"
                     >
                         <Trash2 className="w-4 h-4" />
-                        <span className="hidden md:inline">Remove</span>
+                        <span className="hidden md:inline">{t.common.remove}</span>
                     </button>
                 </div>
             </div>

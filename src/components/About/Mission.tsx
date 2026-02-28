@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface MissionProps {
     data?: {
@@ -12,6 +14,7 @@ interface MissionProps {
 }
 
 export default function Mission({ data }: MissionProps) {
+    const { language } = useLanguage();
     const {
         badge = "Our Mission",
         title = "Redefining modern luxury for everyone.",

@@ -4,9 +4,13 @@ import { motion } from "framer-motion";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 import Link from "next/link";
 
 export default function Hero() {
+    const { language } = useLanguage();
+
     const [data, setData] = useState({
         badge: "New Collection 2024",
         title: "Elevate Your Style with Premium Essentials",
@@ -46,7 +50,7 @@ export default function Hero() {
                                 transition={{ delay: 0.2, duration: 0.5 }}
                                 className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                             >
-                                {data.badge}
+                                {getLocalizedText(data.badge, language)}
                             </motion.div>
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
@@ -54,11 +58,11 @@ export default function Hero() {
                                 transition={{ delay: 0.3, duration: 0.5 }}
                                 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-7xl/none text-neutral-900 dark:text-white"
                             >
-                                {data.title.includes('Premium') ? (
+                                {typeof data.title === 'string' ? data.title.includes('Premium') : getLocalizedText(data.title, language).includes('Premium') ? (
                                     <>
-                                        {data.title.split('Premium')[0]}
+                                        {getLocalizedText(data.title, language).split('Premium')[0]}
                                         <span className="text-blue-600 dark:text-blue-400">Premium</span>
-                                        {data.title.split('Premium')[1]}
+                                        {getLocalizedText(data.title, language).split('Premium')[1]}
                                     </>
                                 ) : data.title}
                             </motion.h1>
@@ -68,7 +72,7 @@ export default function Hero() {
                                 transition={{ delay: 0.4, duration: 0.5 }}
                                 className="max-w-[600px] text-neutral-500 md:text-xl dark:text-neutral-400"
                             >
-                                {data.subtitle}
+                                {getLocalizedText(data.subtitle, language)}
                             </motion.p>
                         </div>
                         <motion.div
@@ -82,14 +86,14 @@ export default function Hero() {
                                 "group relative overflow-hidden"
                             )}>
                                 <span className="relative z-10 flex items-center gap-2">
-                                    {data.ctaPrimary} <ShoppingBag className="h-4 w-4" />
+                                    {getLocalizedText(data.ctaPrimary, language)} <ShoppingBag className="h-4 w-4" />
                                 </span>
                             </Link>
                             <Link href="/shop" className={cn(
                                 "inline-flex h-12 items-center justify-center rounded-lg border border-neutral-200 bg-white px-8 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50 dark:focus-visible:ring-neutral-300"
                             )}>
                                 <span className="flex items-center gap-2">
-                                    {data.ctaSecondary} <ArrowRight className="h-4 w-4" />
+                                    {getLocalizedText(data.ctaSecondary, language)} <ArrowRight className="h-4 w-4" />
                                 </span>
                             </Link>
                         </motion.div>

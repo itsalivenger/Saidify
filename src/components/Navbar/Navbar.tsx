@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { LanguageCode } from "@/lib/translations";
 
 export default function Navbar() {
     const { isAuthenticated, user, logout } = useAuth();
@@ -25,7 +27,8 @@ export default function Navbar() {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const [settings, setSettings] = useState<any>(null);
     const [isLangOpen, setIsLangOpen] = useState(false);
-    const [currentLang, setCurrentLang] = useState("EN");
+    const { language, setLanguage, t, dir } = useLanguage();
+    const currentLang = language.toUpperCase();
 
     const languages = [
         { code: "EN", name: "English" },
@@ -99,12 +102,12 @@ export default function Navbar() {
     }, []);
 
     const navLinks = [
-        { name: "Home", href: "/" },
-        { name: "Collections", href: "/categories" },
-        { name: "Boutique", href: "/shop" },
-        { name: "Studio", href: "/design" },
-        { name: "About", href: "/about" },
-        { name: "Contact", href: "/contact" },
+        { name: t.nav.home, href: "/" },
+        { name: t.nav.collections, href: "/categories" },
+        { name: t.nav.boutique, href: "/shop" },
+        { name: t.nav.studio, href: "/design" },
+        { name: t.nav.about, href: "/about" },
+        { name: t.nav.contact, href: "/contact" },
     ];
 
     return (
@@ -250,45 +253,52 @@ export default function Navbar() {
                                 </Link>
                             )}
 
+
                             {/* Language Dropdown */}
                             <div className="relative" onMouseLeave={() => setIsLangOpen(false)}>
                                 <button
                                     onMouseEnter={() => setIsLangOpen(true)}
-                                    onClick={() => setIsLangOpen(!isLangOpen)}
-                                    className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-accent flex items-center gap-1"
+                                    className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center gap-1.5 border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 mx-2"
                                 >
-                                    <Globe className="w-5 h-5" />
-                                    <span className="text-xs font-bold hidden sm:block">{currentLang}</span>
+                                    <Globe className="w-5 h-5 text-purple-600" />
+                                    <span className="text-sm font-bold hidden sm:block tracking-wide">{currentLang}</span>
                                 </button>
                                 <AnimatePresence>
                                     {isLangOpen && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden z-[60]"
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.15, ease: "easeOut" }}
+                                            className="absolute top-full right-0 pt-2 z-[60]"
                                         >
-                                            <div className="flex flex-col p-1">
-                                                {languages.map((l) => (
-                                                    <button
-                                                        key={l.code}
-                                                        onClick={() => {
-                                                            setCurrentLang(l.code);
-                                                            setIsLangOpen(false);
-                                                        }}
-                                                        className={cn(
-                                                            "text-left text-sm px-4 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors",
-                                                            currentLang === l.code ? "font-bold text-primary" : "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {l.name}
-                                                    </button>
-                                                ))}
+                                            <div className="w-36 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] overflow-hidden">
+                                                <div className="flex flex-col p-1.5 space-y-0.5">
+                                                    {languages.map((l) => (
+                                                        <button
+                                                            key={l.code}
+                                                            onClick={() => {
+                                                                setLanguage(l.code.toLowerCase() as LanguageCode);
+                                                                setIsLangOpen(false);
+                                                            }}
+                                                            className={cn(
+                                                                "text-left text-sm px-4 py-2.5 rounded-xl transition-all flex items-center justify-between",
+                                                                currentLang === l.code
+                                                                    ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold"
+                                                                    : "text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground font-medium"
+                                                            )}
+                                                        >
+                                                            {l.name}
+                                                            {currentLang === l.code && <span className="w-1.5 h-1.5 rounded-full bg-purple-600"></span>}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
                             </div>
+
 
                             <Link
                                 href={isAuthenticated ? "/profile" : "/login"}
@@ -366,7 +376,7 @@ export default function Navbar() {
                                     className="text-2xl font-semibold text-foreground hover:text-primary block py-2 border-b border-muted flex items-center justify-between"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    My Wishlist
+                                    {t.pages.wishlist.title}
                                     {wishlistItems.length > 0 && (
                                         <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">{wishlistItems.length}</span>
                                     )}
@@ -401,7 +411,7 @@ export default function Navbar() {
                                         className="text-2xl font-semibold text-foreground hover:text-primary block py-2 border-b border-muted flex items-center justify-between"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        My Profile
+                                        {t.nav.profile}
                                         <User className="w-5 h-5 text-muted-foreground" />
                                     </Link>
                                 </motion.div>
@@ -422,7 +432,7 @@ export default function Navbar() {
                                         <button
                                             key={l.code}
                                             onClick={() => {
-                                                setCurrentLang(l.code);
+                                                setLanguage(l.code.toLowerCase() as LanguageCode);
                                             }}
                                             className={cn(
                                                 "px-4 py-2 rounded-xl text-sm font-medium transition-all border",
@@ -445,8 +455,8 @@ export default function Navbar() {
                             >
                                 {!isAuthenticated ? (
                                     <>
-                                        <Link href="/login" className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl font-medium text-center" onClick={() => setIsMobileMenuOpen(false)}>Log In</Link>
-                                        <Link href="/signup" className="flex-1 bg-accent text-accent-foreground py-3 rounded-xl font-medium text-center" onClick={() => setIsMobileMenuOpen(false)}>Sign Up</Link>
+                                        <Link href="/login" className="flex-1 bg-primary text-primary-foreground py-3 rounded-xl font-medium text-center" onClick={() => setIsMobileMenuOpen(false)}>{t.nav.login}</Link>
+                                        <Link href="/signup" className="flex-1 bg-accent text-accent-foreground py-3 rounded-xl font-medium text-center" onClick={() => setIsMobileMenuOpen(false)}>{t.nav.signup}</Link>
                                     </>
                                 ) : (
                                     <button

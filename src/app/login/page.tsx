@@ -7,11 +7,13 @@ import { Mail } from "lucide-react";
 import AuthLayout from "@/components/Auth/AuthLayout";
 import AuthInput from "@/components/Auth/AuthInput";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 import { useAuth } from "@/context/AuthContext";
 
 function LoginContent() {
     const { login, isAuthenticated, loading: authLoading } = useAuth();
+    const { t } = useLanguage();
     const searchParams = useSearchParams();
     const router = useRouter();
     const [formData, setFormData] = useState({ email: "", password: "" });
@@ -61,13 +63,13 @@ function LoginContent() {
 
     return (
         <AuthLayout
-            title="Welcome back"
-            subtitle="Enter your credentials to access your account"
+            title={t.pages.auth.loginTitle}
+            subtitle={t.pages.auth.loginSub}
             image="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2671&auto=format&fit=crop"
         >
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <AuthInput
-                    label="Email"
+                    label={t.pages.auth.email}
                     type="email"
                     placeholder="name@example.com"
                     required
@@ -76,12 +78,12 @@ function LoginContent() {
                 />
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium leading-none">Password</label>
+                        <label className="text-sm font-medium leading-none">{t.pages.auth.password}</label>
                         <Link
                             href="/forgot-password"
                             className="text-sm font-medium text-primary hover:underline"
                         >
-                            Forgot password?
+                            {t.pages.auth.forgotPassword}
                         </Link>
                     </div>
                     <AuthInput
@@ -110,7 +112,7 @@ function LoginContent() {
                     disabled={loading}
                     className="w-full bg-white text-black h-12 rounded-xl font-bold hover:bg-neutral-200 transition-all shadow-lg cursor-pointer disabled:opacity-70"
                 >
-                    {loading ? "Signing In..." : "Sign In"}
+                    {loading ? t.pages.auth.signingIn : t.pages.auth.signIn}
                 </button>
 
                 <div className="relative my-8">
@@ -118,7 +120,7 @@ function LoginContent() {
                         <span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                        <span className="bg-background px-2 text-muted-foreground">{t.pages.auth.or}</span>
                     </div>
                 </div>
 
@@ -145,14 +147,14 @@ function LoginContent() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        <span className="font-bold text-sm">Continue with Google</span>
+                        <span className="font-bold text-sm">{t.pages.auth.google}</span>
                     </button>
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground mt-6">
-                    Don&apos;t have an account?{" "}
+                    {t.pages.auth.noAccount}{" "}
                     <Link href="/signup" className="font-bold text-foreground hover:text-primary transition-colors">
-                        Sign up
+                        {t.pages.auth.signUpLink}
                     </Link>
                 </p>
             </form>

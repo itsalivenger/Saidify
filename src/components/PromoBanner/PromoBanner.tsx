@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 import { motion } from "framer-motion";
 import { ArrowRight, Timer } from "lucide-react";
 
 export default function PromoBanner() {
+    const { language } = useLanguage();
+
     const [data, setData] = useState({
         title: "End of Season",
         subtitle: "Clearance Sale",
@@ -85,9 +89,9 @@ export default function PromoBanner() {
                             transition={{ delay: 0.1 }}
                             className="text-4xl md:text-6xl font-black tracking-tight"
                         >
-                            {data.title}
+                            {getLocalizedText(data.title, language)}
                             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 dark:from-blue-600 dark:to-purple-700">
-                                {data.subtitle}
+                                {getLocalizedText(data.subtitle, language)}
                             </span>
                         </motion.h2>
 
@@ -98,7 +102,7 @@ export default function PromoBanner() {
                             transition={{ delay: 0.2 }}
                             className="text-lg md:text-xl text-neutral-300 dark:text-neutral-600 max-w-lg"
                         >
-                            {data.description}
+                            {getLocalizedText(data.description, language)}
                         </motion.p>
 
                         <motion.button

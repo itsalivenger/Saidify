@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ShopGrid from "@/components/Shop/ShopGrid";
 import QuickViewModal from "@/components/Shop/QuickViewModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Product {
     _id: string;
@@ -18,6 +19,7 @@ interface Product {
 
 function SearchContent() {
     const searchParams = useSearchParams();
+    const { t } = useLanguage();
     const query = searchParams.get("q");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,11 +50,11 @@ function SearchContent() {
         <main className="min-h-screen bg-background py-24 px-4 md:px-8">
             <div className="container mx-auto max-w-[1600px]">
                 <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-8">
-                    {loading ? "Searching..." : `Search results for "${query || ''}"`}
+                    {loading ? t.pages.search.searching : `${t.pages.search.resultsFor} "${query || ''}"`}
                 </h1>
 
                 {loading ? (
-                    <div className="text-center py-20">Loading...</div>
+                    <div className="text-center py-20">{t.common.loading}</div>
                 ) : products.length > 0 ? (
                     <ShopGrid
                         products={products.map((p: any) => ({
@@ -71,7 +73,7 @@ function SearchContent() {
                     />
                 ) : (
                     <div className="text-center py-20">
-                        <p className="text-xl text-muted-foreground">No products found considering your search criteria.</p>
+                        <p className="text-xl text-muted-foreground">{t.pages.search.noProducts}</p>
                     </div>
                 )}
             </div>

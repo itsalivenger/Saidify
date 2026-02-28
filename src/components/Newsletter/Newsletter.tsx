@@ -3,8 +3,12 @@
 import { motion } from "framer-motion";
 import { Mail, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 export default function Newsletter() {
+    const { language } = useLanguage();
+
     const [email, setEmail] = useState("");
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [message, setMessage] = useState("");
@@ -73,7 +77,7 @@ export default function Newsletter() {
                             transition={{ delay: 0.1 }}
                             className="text-3xl font-bold tracking-tight text-white dark:text-black sm:text-4xl mb-4"
                         >
-                            {data.title}
+                            {getLocalizedText(data.title, language)}
                         </motion.h2>
 
                         <motion.p
@@ -83,7 +87,7 @@ export default function Newsletter() {
                             transition={{ delay: 0.2 }}
                             className="text-lg text-neutral-400 dark:text-neutral-600 mb-10 max-w-lg mx-auto"
                         >
-                            {data.subtitle}
+                            {getLocalizedText(data.subtitle, language)}
                         </motion.p>
 
                         <motion.div

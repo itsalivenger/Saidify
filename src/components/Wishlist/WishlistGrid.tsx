@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import ProductCard from "@/components/Shop/ProductCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface WishlistGridProps {
     products: any[];
 }
 
 export default function WishlistGrid({ products }: WishlistGridProps) {
+    const { t } = useLanguage();
     if (products.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -23,7 +25,7 @@ export default function WishlistGrid({ products }: WishlistGridProps) {
                     href="/shop"
                     className="px-8 py-3 bg-white text-black rounded-full font-bold hover:bg-neutral-200 transition-all shadow-lg"
                 >
-                    Start Shopping
+                    {t.pages.cart.startShopping}
                 </Link>
             </div>
         );

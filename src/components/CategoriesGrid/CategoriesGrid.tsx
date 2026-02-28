@@ -5,10 +5,12 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Tag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface Category {
     _id: string;
-    name: string;
+    name: any;
     slug: string;
     image?: string;
 }
@@ -28,6 +30,7 @@ const LAYOUT_CLASSES = [
 ];
 
 export default function CategoriesGrid() {
+    const { language } = useLanguage();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -101,7 +104,7 @@ export default function CategoriesGrid() {
                     {categories.map((category, index) => (
                         <Link
                             key={category._id}
-                            href={`/shop?category=${encodeURIComponent(category.name)}`}
+                            href={`/shop?category=${encodeURIComponent(category.slug)}`}
                             className={cn(
                                 "relative group overflow-hidden rounded-3xl cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300",
                                 LAYOUT_CLASSES[index % LAYOUT_CLASSES.length]
@@ -120,7 +123,7 @@ export default function CategoriesGrid() {
                                     <>
                                         <img
                                             src={category.image}
-                                            alt={category.name}
+                                            alt={getLocalizedText(category.name, language)}
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300" />
@@ -146,7 +149,7 @@ export default function CategoriesGrid() {
                                     {/* Bottom Text info */}
                                     <div className="transform transition-transform duration-300 group-hover:-translate-y-1">
                                         <h3 className="text-3xl font-bold text-white tracking-tight">
-                                            {category.name}
+                                            {getLocalizedText(category.name, language)}
                                         </h3>
                                     </div>
                                 </div>

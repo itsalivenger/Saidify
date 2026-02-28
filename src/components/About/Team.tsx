@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { getLocalizedText } from "@/lib/translations";
 
 interface TeamProps {
     data?: {
@@ -38,6 +40,7 @@ const DEFAULT_TEAM = [
 ];
 
 export default function Team({ data }: TeamProps) {
+    const { language } = useLanguage();
     const title = data?.title || "Meet the Team";
     const subtitle = data?.subtitle || "The creative minds behind the brand.";
     const members = data?.members?.length ? data.members : DEFAULT_TEAM;
@@ -65,14 +68,14 @@ export default function Team({ data }: TeamProps) {
                             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl mb-4 bg-neutral-100">
                                 <img
                                     src={member.image}
-                                    alt={member.name}
+                                    alt={getLocalizedText(member.name, language)}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                                 {/* Overlay */}
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                             </div>
-                            <h3 className="text-lg font-bold">{member.name}</h3>
-                            <p className="text-sm text-primary font-medium uppercase tracking-wide">{member.role}</p>
+                            <h3 className="text-lg font-bold">{getLocalizedText(member.name, language)}</h3>
+                            <p className="text-sm text-primary font-medium uppercase tracking-wide">{getLocalizedText(member.role, language)}</p>
                         </motion.div>
                     ))}
                 </div>
