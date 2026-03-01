@@ -1,7 +1,6 @@
 'use client';
 
-import {
-    Globe, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Layout,
@@ -18,7 +17,8 @@ import {
     Users,
     ChevronDown,
     ChevronUp,
-    Type
+    Type,
+    Globe
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ export default function AboutCMSPage() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [activeSection, setActiveSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
-    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
+    const [editingLang, setEditingLang] = useState<'en' | 'fr' | 'ar'>('en');
 
     useEffect(() => {
         fetchSettings();
@@ -454,6 +454,10 @@ export default function AboutCMSPage() {
     );
 }
 
+
+function Label({ children }: { children: React.ReactNode }) {
+    return <label className="block text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2">{children}</label>;
+}
 
 function LocalizedField({ label, obj, lang, onChange, placeholder, multiline }: { label: string; obj: any; lang: string; onChange: (v: any) => void; placeholder?: string; multiline?: boolean }) {
     const value = obj?.[lang] || '';
