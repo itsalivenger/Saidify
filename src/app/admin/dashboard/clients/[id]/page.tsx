@@ -158,7 +158,7 @@ export default function ClientProfilePage() {
                         {user.cart.length === 0 ? (
                             <div className="bg-neutral-50 dark:bg-neutral-900/50 p-12 rounded-3xl border-2 border-dashed border-neutral-200 dark:border-neutral-800 text-center">
                                 <ShoppingCart className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-                                <p className="text-muted-foreground font-medium">This customer's cart is empty.</p>
+                                <p className="text-muted-foreground font-medium">This customer&apos;s cart is empty.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

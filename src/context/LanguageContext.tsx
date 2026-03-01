@@ -13,21 +13,23 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    const [language, setLanguageState] = useState<LanguageCode>('en');
+    const [language, setLanguageState] = useState<LanguageCode>(() => {
+        if (typeof window !== 'undefined') {
+            const storedLang = localStorage.getItem('site_lang') as LanguageCode;
+            if (storedLang && ['en', 'fr', 'ar'].includes(storedLang)) {
+                return storedLang;
+            }
+            const browserLang = navigator.language.split('-')[0];
+            if (browserLang === 'fr' || browserLang === 'ar') {
+                return browserLang as LanguageCode;
+            }
+        }
+        return 'en';
+    });
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Read from localStorage on mount
-        const storedLang = localStorage.getItem('site_lang') as LanguageCode;
-        if (storedLang && ['en', 'fr', 'ar'].includes(storedLang)) {
-            setLanguageState(storedLang);
-        } else {
-            // Auto detect from browser
-            const browserLang = navigator.language.split('-')[0];
-            if (browserLang === 'fr' || browserLang === 'ar') {
-                setLanguageState(browserLang as LanguageCode);
-            }
-        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

@@ -29,7 +29,7 @@ export async function PUT(req: Request, context: RouteContext) {
         const isAdminUser = await isAdmin();
         const body = await req.json();
 
-        let filter: any = { _id: id };
+        const filter: any = { _id: id };
 
         if (!isAdminUser) {
             const userId = await getUserId();

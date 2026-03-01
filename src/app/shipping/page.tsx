@@ -49,7 +49,7 @@ export default function ShippingPage() {
                             </div>
                             <div>
                                 <h4 className="font-bold text-white mb-2">Can I change my shipping address?</h4>
-                                <p className="text-neutral-400 text-sm">Address changes can only be made before the order is marked as "Shipped". Contact us immediately for changes.</p>
+                                <p className="text-neutral-400 text-sm">Address changes can only be made before the order is marked as &quot;Shipped&quot;. Contact us immediately for changes.</p>
                             </div>
                         </div>
                     </section>

@@ -24,6 +24,15 @@ interface AdminUser {
     role?: string;
 }
 
+interface MenuItem {
+    name: string;
+    icon: any; // Using any for Lucide icons as they can be complex to type strictly here
+    path?: string;
+    isDropdown?: boolean;
+    stateKey?: string;
+    options?: { name: string; path: string }[];
+}
+
 export default function AdminDashboardLayout({
     children,
 }: {
@@ -37,22 +46,25 @@ export default function AdminDashboardLayout({
     const [isSettingsOpen, setIsSettingsOpen] = useState(pathname.includes('/settings'));
     const [isDesignerOpen, setIsDesignerOpen] = useState(pathname.includes('/blanks'));
     const [isWebsiteOpen, setIsWebsiteOpen] = useState(pathname.includes('/website') || pathname.includes('/about'));
-    const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+    const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
+        if (typeof window !== 'undefined') {
+            const userStr = localStorage.getItem('adminUser');
+            if (userStr) {
+                try {
+                    return JSON.parse(userStr);
+                } catch {
+                    return null;
+                }
+            }
+        }
+        return null;
+    });
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
         if (!token) {
             router.push('/admin/login');
             return;
-        }
-
-        const userStr = localStorage.getItem('adminUser');
-        if (userStr) {
-            try {
-                setAdminUser(JSON.parse(userStr));
-            } catch {
-                setAdminUser(null);
-            }
         }
     }, [router]);
 
@@ -62,7 +74,7 @@ export default function AdminDashboardLayout({
         router.push('/admin/login');
     };
 
-    const menuItems = [
+    const menuItems: MenuItem[] = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
         {
             name: 'Products',
@@ -105,9 +117,9 @@ export default function AdminDashboardLayout({
         collapsed: { x: -280, width: '0px' }
     };
 
-    const SideNavItem = ({ item }: { item: any }) => {
+    const SideNavItem = ({ item }: { item: MenuItem }) => {
         const isActive = pathname === item.path;
-        const hasActiveChild = item.options?.some((opt: any) => pathname === opt.path);
+        const hasActiveChild = item.options?.some((opt) => pathname === opt.path);
 
         if (item.isDropdown) {
             const getIsOpen = () => {
@@ -163,7 +175,7 @@ export default function AdminDashboardLayout({
                                 exit={{ opacity: 0, height: 0 }}
                                 className="overflow-hidden mt-1 ml-4 border-l border-white/10"
                             >
-                                {item.options.map((opt: any) => {
+                                {item.options?.map((opt) => {
                                     const isSubActive = pathname === opt.path;
                                     return (
                                         <Link
@@ -188,7 +200,7 @@ export default function AdminDashboardLayout({
         return (
             <div className="px-3 py-1">
                 <Link
-                    href={item.path}
+                    href={item.path || '#'}
                     className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${isActive
                         ? 'bg-purple-600/20 text-white border border-purple-500/20 shadow-[0_0_20px_rgba(147,51,234,0.1)]'
                         : 'text-gray-400 hover:bg-white/5 hover:text-white'

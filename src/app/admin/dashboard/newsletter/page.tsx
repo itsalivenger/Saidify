@@ -255,7 +255,7 @@ export default function AdminNewsletterPage() {
                                     <Mail className="w-16 h-16 text-neutral-700 mb-4" />
                                     <p className="text-neutral-400 font-bold">No subscribers yet</p>
                                     <p className="text-neutral-600 text-sm mt-1">
-                                        When someone subscribes from the site, they'll appear here.
+                                        When someone subscribes from the site, they&apos;ll appear here.
                                     </p>
                                 </div>
                             ) : (

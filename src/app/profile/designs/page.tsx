@@ -127,7 +127,7 @@ export default function MyDesignsPage() {
                             </div>
                             <h3 className="text-2xl font-black mb-2">No saved designs</h3>
                             <p className="text-muted-foreground mb-8 text-sm max-w-md mx-auto">
-                                You haven't saved any designs yet. Head over to our shop, pick a product, and start creating!
+                                You haven&apos;t saved any designs yet. Head over to our shop, pick a product, and start creating!
                             </p>
                             <Link
                                 href="/design"

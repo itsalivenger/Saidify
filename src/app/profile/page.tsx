@@ -162,7 +162,7 @@ export default function ProfilePage() {
                                         <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] p-16 text-center">
                                             <Box className="w-16 h-16 text-neutral-300 mx-auto mb-6" />
                                             <h3 className="text-2xl font-black mb-2">No orders yet</h3>
-                                            <p className="text-muted-foreground mb-8 text-sm">You haven't placed any orders yet. Start shopping our premium collection!</p>
+                                            <p className="text-muted-foreground mb-8 text-sm">You haven&apos;t placed any orders yet. Start shopping our premium collection!</p>
                                             <Link
                                                 href="/shop"
                                                 className="bg-black text-white dark:bg-white dark:text-black px-8 py-4 rounded-2xl font-black inline-flex items-center gap-2 hover:scale-[1.02] transition-transform active:scale-[0.98]"

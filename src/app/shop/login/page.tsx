@@ -135,7 +135,7 @@ export default function ShopLoginPage() {
 
                     <div className="text-center mt-8">
                         <p className="text-muted-foreground font-medium">
-                            Don't have an account? <Link href="/shop/signup" className="text-purple-600 font-black hover:underline ml-1 cursor-pointer">Create one</Link>
+                            Don&apos;t have an account? <Link href="/shop/signup" className="text-purple-600 font-black hover:underline ml-1 cursor-pointer">Create one</Link>
                         </p>
                     </div>
                 </form>

@@ -56,7 +56,7 @@ export default function ContactForm() {
                 </motion.div>
                 <h3 className="text-2xl font-bold mb-2">Message Sent!</h3>
                 <p className="text-muted-foreground mb-8">
-                    Thank you for reaching out. We've received your message and will get back to you within 24 hours.
+                    Thank you for reaching out. We&apos;ve received your message and will get back to you within 24 hours.
                 </p>
                 <button
                     onClick={() => setStatus('idle')}

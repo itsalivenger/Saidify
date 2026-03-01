@@ -386,7 +386,7 @@ export default function WebsiteControlPage() {
             <div className="mb-10 flex justify-between items-start">
                 <div>
                     <h1 className="text-4xl font-black mb-2">Website Control</h1>
-                    <p className="text-muted-foreground">Manage your storefront's content and appearance.</p>
+                    <p className="text-muted-foreground">Manage your storefront&apos;s content and appearance.</p>
                 </div>
                 {/* Save Button is now sticky at the bottom but we can keep a primary one here if needed or just use the floating one */}
             </div>

@@ -19,7 +19,7 @@ export default function WishlistGrid({ products }: WishlistGridProps) {
                 </div>
                 <h2 className="text-2xl font-bold mb-2">Your wishlist is empty</h2>
                 <p className="text-muted-foreground mb-8 max-w-sm">
-                    Looks like you haven't added any items to your wishlist yet.
+                    Looks like you haven&apos;t added any items to your wishlist yet.
                 </p>
                 <Link
                     href="/shop"
