@@ -13,7 +13,8 @@ import {
     Settings,
     Users,
     Palette,
-    Package
+    Package,
+    Mail
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -95,6 +96,7 @@ export default function AdminDashboardLayout({
                 { name: 'Add Blank Product', path: '/admin/dashboard/blanks/new' },
             ]
         },
+        { name: 'Newsletter', icon: Mail, path: '/admin/dashboard/newsletter' },
         { name: 'Website Control', icon: Settings, path: '/admin/dashboard/settings/website' },
     ];
 

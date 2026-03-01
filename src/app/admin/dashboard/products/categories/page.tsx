@@ -1,49 +1,63 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Tag,
     Plus,
     Edit2,
     Trash2,
-    Check,
     X,
     Loader2,
     ToggleLeft,
     ToggleRight,
     AlertCircle,
     Image as ImageIcon,
-    Upload
+    Upload,
+    Globe
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
-import { useRef } from 'react';
+
+type LocalizedString = { en: string; fr: string; ar: string };
 
 interface Category {
     _id: string;
-    name: string;
+    name: string | LocalizedString;
     slug: string;
     active: boolean;
-    description?: string;
+    description?: string | LocalizedString;
     image?: string;
 }
+
+// Get a display string from a localized field or plain string
+const toStr = (val: string | LocalizedString | undefined): string => {
+    if (!val) return '';
+    if (typeof val === 'string') return val;
+    return val.en || val.fr || val.ar || '';
+};
 
 export default function CategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-
-    // Form state
-    const [formData, setFormData] = useState({
-        name: { en: '', fr: '', ar: '' },
-        active: true,
-        description: { en: '', fr: '', ar: '' },
-        image: ''
-    });
-    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
+    const [editingLang, setEditingLang] = useState<'en' | 'fr' | 'ar'>('en');
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [formData, setFormData] = useState({
+        name: { en: '', fr: '', ar: '' } as LocalizedString,
+        active: true,
+        description: { en: '', fr: '', ar: '' } as LocalizedString,
+        image: ''
+    });
+
+    const emptyForm = () => ({
+        name: { en: '', fr: '', ar: '' } as LocalizedString,
+        active: true,
+        description: { en: '', fr: '', ar: '' } as LocalizedString,
+        image: ''
+    });
 
     useEffect(() => {
         fetchCategories();
@@ -66,22 +80,19 @@ export default function CategoriesPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-
         try {
             const method = editingId ? 'PUT' : 'POST';
             const body = editingId ? { ...formData, id: editingId } : formData;
-
             const res = await fetch('/api/categories', {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             });
-
             if (res.ok) {
                 await fetchCategories();
                 setIsAdding(false);
                 setEditingId(null);
-                setFormData({ name: { en: '', fr: '', ar: '' }, active: true, description: { en: '', fr: '', ar: '' }, image: '' });
+                setFormData(emptyForm());
             }
         } catch (error) {
             console.error('Error saving category:', error);
@@ -92,13 +103,10 @@ export default function CategoriesPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this category?')) return;
-
         setLoading(true);
         try {
             const res = await fetch(`/api/categories?id=${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                await fetchCategories();
-            }
+            if (res.ok) await fetchCategories();
         } catch (error) {
             console.error('Error deleting category:', error);
         } finally {
@@ -108,12 +116,13 @@ export default function CategoriesPage() {
 
     const startEdit = (cat: Category) => {
         setEditingId(cat._id);
-        setFormData({
-            name: cat.name,
-            active: cat.active,
-            description: cat.description || '',
-            image: cat.image || ''
-        });
+        const nameObj: LocalizedString = typeof cat.name === 'object' && cat.name !== null
+            ? cat.name as LocalizedString
+            : { en: cat.name as string, fr: '', ar: '' };
+        const descObj: LocalizedString = typeof cat.description === 'object' && cat.description !== null
+            ? cat.description as LocalizedString
+            : { en: (cat.description as string) || '', fr: '', ar: '' };
+        setFormData({ name: nameObj, active: cat.active, description: descObj, image: cat.image || '' });
         setIsAdding(true);
     };
 
@@ -121,13 +130,8 @@ export default function CategoriesPage() {
         setUploading(true);
         const uploadData = new FormData();
         uploadData.append('file', file);
-
         try {
-            const res = await fetch('/api/upload', {
-                method: 'POST',
-                body: uploadData,
-            });
-
+            const res = await fetch('/api/upload', { method: 'POST', body: uploadData });
             if (res.ok) {
                 const data = await res.json();
                 setFormData(prev => ({ ...prev, image: data.url }));
@@ -165,11 +169,7 @@ export default function CategoriesPage() {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                            setIsAdding(true);
-                            setEditingId(null);
-                            setFormData({ name: { en: '', fr: '', ar: '' }, active: true, description: { en: '', fr: '', ar: '' }, image: '' });
-                        }}
+                        onClick={() => { setIsAdding(true); setEditingId(null); setFormData(emptyForm()); }}
                         className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-xl transition-all shadow-lg shadow-purple-600/20"
                     >
                         <Plus className="w-5 h-5" />
@@ -195,28 +195,31 @@ export default function CategoriesPage() {
                             </button>
                         </div>
 
-                        
-                        <div className="flex justify-between items-center bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit mb-6">
-                            {[
-                                { id: 'en', label: 'English' },
-                                { id: 'fr', label: 'Français' },
-                                { id: 'ar', label: 'العربية' },
-                            ].map((lang) => (
-                                <button
-                                    key={lang.id}
-                                    type="button"
-                                    onClick={() => setEditingLang(lang.id as 'en'|'fr'|'ar')}
-                                    className={cn(
-                                        "flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-black transition-all",
-                                        editingLang === lang.id
-                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                                            : "text-gray-500 hover:text-gray-300"
-                                    )}
-                                >
-                                    <Globe className="w-4 h-4" />
-                                    {lang.label}
-                                </button>
-                            ))}
+                        {/* Language selector */}
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-black uppercase tracking-widest text-neutral-500">Editing in:</span>
+                            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-fit">
+                                {[
+                                    { id: 'en', label: 'English' },
+                                    { id: 'fr', label: 'Français' },
+                                    { id: 'ar', label: 'العربية' },
+                                ].map((lang) => (
+                                    <button
+                                        key={lang.id}
+                                        type="button"
+                                        onClick={() => setEditingLang(lang.id as 'en' | 'fr' | 'ar')}
+                                        className={cn(
+                                            "flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-black transition-all",
+                                            editingLang === lang.id
+                                                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                                : "text-gray-500 hover:text-gray-300"
+                                        )}
+                                    >
+                                        <Globe className="w-3.5 h-3.5" />
+                                        {lang.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -225,8 +228,8 @@ export default function CategoriesPage() {
                                 <input
                                     type="text"
                                     required={editingLang === 'en'}
-                                    value={formData.name?.[editingLang] || ''}
-                                    onChange={(e) => setFormData({ ...formData, name: { ...(formData.name || {}), [editingLang]: e.target.value } })}
+                                    value={formData.name[editingLang]}
+                                    onChange={(e) => setFormData({ ...formData, name: { ...formData.name, [editingLang]: e.target.value } })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                                     placeholder="e.g. Winter Collection"
                                 />
@@ -253,8 +256,8 @@ export default function CategoriesPage() {
                                 <label className="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1">Description ({editingLang.toUpperCase()})</label>
                                 <textarea
                                     rows={2}
-                                    value={formData.description?.[editingLang] || ''}
-                                    onChange={(e) => setFormData({ ...formData, description: { ...(formData.description || {}), [editingLang]: e.target.value } })}
+                                    value={formData.description[editingLang]}
+                                    onChange={(e) => setFormData({ ...formData, description: { ...formData.description, [editingLang]: e.target.value } })}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
                                     placeholder="Brief description of this category..."
                                 />
@@ -336,13 +339,12 @@ export default function CategoriesPage() {
                         animate={{ opacity: 1 }}
                         className="group relative p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-purple-500/30 transition-all duration-300 overflow-hidden"
                     >
-                        {/* Background Decoration */}
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/5 blur-[40px] rounded-full group-hover:bg-purple-600/10 transition-all" />
 
                         <div className="mb-4">
                             <div className="aspect-[21/9] rounded-xl overflow-hidden mb-4 bg-neutral-900 border border-white/5 relative">
                                 {cat.image ? (
-                                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <img src={cat.image} alt={toStr(cat.name)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-purple-600/5">
                                         <Tag className="w-8 h-8 text-purple-500/20" />
@@ -367,7 +369,7 @@ export default function CategoriesPage() {
 
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-bold text-xl">{cat.name}</h3>
+                                <h3 className="font-bold text-xl">{toStr(cat.name)}</h3>
                                 {!cat.active && (
                                     <span className="flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full border border-red-500/20 font-bold uppercase tracking-wider">
                                         <AlertCircle className="w-3 h-3" />
@@ -377,7 +379,7 @@ export default function CategoriesPage() {
                             </div>
                             <p className="text-sm text-gray-500 truncate mb-1">/{cat.slug}</p>
                             <p className="text-sm text-gray-400 line-clamp-2 min-h-[40px]">
-                                {cat.description || 'No description provided.'}
+                                {toStr(cat.description) || 'No description provided.'}
                             </p>
                         </div>
                     </motion.div>

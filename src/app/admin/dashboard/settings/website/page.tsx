@@ -70,7 +70,7 @@ interface Category {
 export default function WebsiteControlPage() {
     const [activeTab, setActiveTab] = useState('home');
     const [activeAboutSection, setActiveAboutSection] = useState<'mission' | 'story' | 'values' | 'team'>('mission');
-    const [editingLang, setEditingLang] = useState<'en'|'fr'|'ar'>('en');
+    const [editingLang, setEditingLang] = useState<'en' | 'fr' | 'ar'>('en');
     const [settings, setSettings] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -409,10 +409,9 @@ export default function WebsiteControlPage() {
                 )}
             </AnimatePresence>
 
-            {/* Global Tabs */}
-            
             {/* Global Tabs & Language */}
-            <div className="flex flex-col md:flex-row justify-between mb-10 gap-4">
+            <div className="flex flex-col gap-3 mb-10">
+                {/* Main section tabs */}
                 <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit">
                     {TABS.map((tab) => (
                         <button
@@ -430,29 +429,34 @@ export default function WebsiteControlPage() {
                         </button>
                     ))}
                 </div>
-                
-                <div className="flex bg-white/5 p-1.5 rounded-[1.5rem] border border-white/10 w-fit h-fit">
-                    {[
-                        { id: 'en', label: 'English' },
-                        { id: 'fr', label: 'Français' },
-                        { id: 'ar', label: 'العربية' },
-                    ].map((lang) => (
-                        <button
-                            key={lang.id}
-                            onClick={() => setEditingLang(lang.id as 'en'|'fr'|'ar')}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-black transition-all",
-                                editingLang === lang.id
-                                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                                    : "text-gray-500 hover:text-gray-300"
-                            )}
-                        >
-                            <Globe className="w-4 h-4" />
-                            {lang.label}
-                        </button>
-                    ))}
+
+                {/* Language selector — beneath the main tabs */}
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-black uppercase tracking-widest text-neutral-500">Editing in:</span>
+                    <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-fit">
+                        {[
+                            { id: 'en', label: 'English' },
+                            { id: 'fr', label: 'Français' },
+                            { id: 'ar', label: 'العربية' },
+                        ].map((lang) => (
+                            <button
+                                key={lang.id}
+                                onClick={() => setEditingLang(lang.id as 'en' | 'fr' | 'ar')}
+                                className={cn(
+                                    "flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-black transition-all",
+                                    editingLang === lang.id
+                                        ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
+                                        : "text-gray-500 hover:text-gray-300"
+                                )}
+                            >
+                                <Globe className="w-3.5 h-3.5" />
+                                {lang.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
+
 
 
             {/* Content Tabs */}
